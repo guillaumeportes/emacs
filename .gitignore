@@ -1,0 +1,7 @@
+.cache
+.last-package-update-day
+*~
+elpa
+network-security.data
+projectile-bookmarks.eld
+recentf

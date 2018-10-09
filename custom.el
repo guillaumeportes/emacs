@@ -1,0 +1,6 @@
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(add-hook 'window-setup-hook 'toggle-frame-maximized t)
+(global-flycheck-mode)
+(add-hook  'after-init-hook 'global-company-mode)
+(global-hl-line-mode 1)
