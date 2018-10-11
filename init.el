@@ -6,9 +6,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ggtags-extra-args (quote ("--gtagslabel=pygments")))
+ '(org-agenda-files (quote ("~/org/1.org")))
  '(package-selected-packages
    (quote
-    (git-gutter exec-path-from-shell which-key use-package persp-projectile omnisharp ocodo-svg-modelines magit ivy-rich doom-themes doom-modeline counsel-projectile company auto-package-update atom-one-dark-theme all-the-icons-ivy))))
+    (ace-window org-plus-contrib git-gutter exec-path-from-shell which-key use-package persp-projectile omnisharp ocodo-svg-modelines magit ivy-rich doom-themes doom-modeline counsel-projectile company auto-package-update atom-one-dark-theme all-the-icons-ivy))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
