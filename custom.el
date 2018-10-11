@@ -34,7 +34,8 @@
 		 which-key
 		 ivy-rich
 		 exec-path-from-shell
-		 ggtags))
+		 ggtags
+		 git-gutter))
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -103,5 +104,8 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (toggle-frame-maximized)
 (recentf-mode 1)
+
+(require 'git-gutter)
+(global-git-gutter-mode +1)
 
 ;;; custom.el ends here

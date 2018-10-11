@@ -8,7 +8,7 @@
  '(ggtags-extra-args (quote ("--gtagslabel=pygments")))
  '(package-selected-packages
    (quote
-    (exec-path-from-shell which-key use-package persp-projectile omnisharp ocodo-svg-modelines magit ivy-rich doom-themes doom-modeline counsel-projectile company auto-package-update atom-one-dark-theme all-the-icons-ivy))))
+    (git-gutter exec-path-from-shell which-key use-package persp-projectile omnisharp ocodo-svg-modelines magit ivy-rich doom-themes doom-modeline counsel-projectile company auto-package-update atom-one-dark-theme all-the-icons-ivy))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
