@@ -5,3 +5,7 @@ elpa
 network-security.data
 projectile-bookmarks.eld
 recentf
+projectile*
+straight
+var
+smex-items
