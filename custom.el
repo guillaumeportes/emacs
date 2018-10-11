@@ -163,7 +163,7 @@ Inserted by installing org-mode or when a release is made."
 (setq org-log-done t)
 
 (require 'ace-window)
-(global-set-key (kbd "M-p") 'ace-window)
+(global-set-key (kbd "M-o") 'ace-window)
 
 (smex-initialize)
 (global-set-key (kbd "C-x g") 'magit-status)
