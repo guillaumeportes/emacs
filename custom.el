@@ -52,11 +52,11 @@ Inserted by installing org-mode or when a release is made."
 		 doom-themes
 		 omnisharp
 		 company
+		 company-quickhelp
 		 flycheck
 		 ivy
 		 counsel
 		 swiper
-		 auto-package-update
 		 doom-modeline
 		 projectile
 		 counsel-projectile
@@ -70,7 +70,15 @@ Inserted by installing org-mode or when a release is made."
 		 git-gutter
 		 org-plus-contrib
 		 ace-window
-		 smex))
+		 smex
+		 neotree
+		 lsp-mode
+		 lsp-python
+		 lsp-ui
+		 company-lsp
+		 yaml-mode
+		 helpful
+		 god-mode))
 
 (dolist (p my-packages)
   (straight-use-package p))
@@ -101,7 +109,7 @@ Inserted by installing org-mode or when a release is made."
 (global-set-key (kbd "<f1> f") 'counsel-describe-function)
 (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
 (global-set-key (kbd "<f1> l") 'counsel-find-library)
-(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+(global-set-key (kbd "<f2n> i") 'counsel-info-lookup-symbol)
 (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
 (global-set-key (kbd "C-c g") 'counsel-git)
 (global-set-key (kbd "C-c j") 'counsel-git-grep)
@@ -110,23 +118,18 @@ Inserted by installing org-mode or when a release is made."
 (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
 (global-set-key (kbd "C-c C-r") 'ivy-resume)
 
-(require 'auto-package-update)
-(setq auto-package-update-delete-old-versions t)
-(auto-package-update-maybe)
-
 (doom-modeline-init)
 
 (require 'projectile)
 (projectile-mode +1)
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
 (setq projectile-enable-caching t)
-(setq projectile-switch-project-action 'projectile-dired)
 
 (counsel-projectile-mode)
 
 (persp-mode)
 
-(define-key projectile-mode-map (kbd "s-s") 'projectile-persp-switch-project)
+(define-key projectile-mode-map (kbd "C-c C-p p") 'projectile-persp-switch-project)
 
 (which-key-mode)
 
@@ -153,7 +156,10 @@ Inserted by installing org-mode or when a release is made."
 (global-git-gutter-mode +1)
 (setq inhibit-splash-screen t)
 (transient-mark-mode 1)
-(setq ns-right-alternate-modifier (quote none))
+
+(define-key key-translation-map (kbd "M-3") (kbd "#"))
+;(setq mac-command-modifier 'meta)
+;(setq mac-option-modifier 'control)
 
 (require 'org)
 (setq org-todo-keywords
@@ -167,5 +173,38 @@ Inserted by installing org-mode or when a release is made."
 
 (smex-initialize)
 (global-set-key (kbd "C-x g") 'magit-status)
+
+(require 'neotree)
+
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+(setq neo-smart-open t)
+(setq projectile-switch-project-action 'projectile-dired)
+
+(defun neotree-project-dir ()
+    "Open NeoTree using the git root."
+    (interactive)
+    (let ((project-dir (projectile-project-root))
+          (file-name (buffer-file-name)))
+      (neotree-toggle)
+      (if project-dir
+          (if (neo-global--window-exists-p)
+              (progn
+                (neotree-dir project-dir)
+                (neotree-find file-name)))
+        (message "Could not find git project root."))))
+
+(global-set-key [f8] 'neotree-project-dir)
+(setq insert-directory-program (executable-find "gls"))
+
+(require 'lsp-mode)
+(require 'lsp-python)
+(add-hook 'python-mode-hook #'lsp-python-enable)
+
+(require 'company-quickhelp)
+(company-quickhelp-mode)
+
+(require 'god-mode)
+(which-key-enable-god-mode-support)
+(global-set-key (kbd "<escape>") 'god-local-mode)
 
 ;;; custom.el ends here
