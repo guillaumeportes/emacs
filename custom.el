@@ -72,16 +72,24 @@ Inserted by installing org-mode or when a release is made."
 		 ace-window
 		 smex
 		 neotree
-		 lsp-mode
-		 lsp-python
-		 lsp-ui
-		 company-lsp
 		 yaml-mode
 		 helpful
-		 god-mode))
+		 god-mode
+		 avy
+		 easy-kill
+		 highlight-parentheses
+		 sly))
 
 (dolist (p my-packages)
   (straight-use-package p))
+
+(define-globalized-minor-mode global-highlight-parentheses-mode
+  highlight-parentheses-mode
+  (lambda ()
+    (highlight-parentheses-mode t)))
+(global-highlight-parentheses-mode t)
+
+(show-paren-mode t)
 
 (require 'doom-themes)
 (setq doom-themes-enable-bold t)
@@ -94,9 +102,28 @@ Inserted by installing org-mode or when a release is made."
  'company
  '(add-to-list 'company-backends 'company-omnisharp))
 
-(add-hook 'csharp-mode-hook #'company-mode)
-(add-hook 'csharp-mode-hook 'omnisharp-mode)
-(add-to-list 'company-backends 'company-omnisharp)
+(defun my-csharp-mode-setup ()
+  (omnisharp-mode)
+  (company-mode)
+  (flycheck-mode)
+
+  (setq indent-tabs-mode nil)
+  (setq c-syntactic-indentation t)
+  (c-set-style "ellemtel")
+  (setq c-basic-offset 4)
+  (setq tab-width 4)
+  (setq evil-shift-width 4)
+
+  ;csharp-mode README.md recommends this too
+  (electric-pair-mode 1)       ;; Emacs 24
+  (electric-pair-local-mode 1) ;; Emacs 25
+  (electric-indent-mode)
+
+  ;(local-set-key (kbd "C-c r r") 'omnisharp-run-code-action-refactoring)
+					;(local-set-key (kbd "C-c C-c") 'recompile))
+  )
+
+(add-hook 'csharp-mode-hook 'my-csharp-mode-setup t)
 
 (require 'ivy)
 (setq ivy-use-virtual-buffers t)
@@ -151,13 +178,14 @@ Inserted by installing org-mode or when a release is made."
 (fset 'yes-or-no-p 'y-or-n-p)
 (toggle-frame-maximized)
 (recentf-mode 1)
+(global-display-line-numbers-mode t)
+(setq display-line-numbers "%4d \u2502 ")
 
 (require 'git-gutter)
 (global-git-gutter-mode +1)
 (setq inhibit-splash-screen t)
 (transient-mark-mode 1)
 
-(define-key key-translation-map (kbd "M-3") (kbd "#"))
 ;(setq mac-command-modifier 'meta)
 ;(setq mac-option-modifier 'control)
 
@@ -169,7 +197,7 @@ Inserted by installing org-mode or when a release is made."
 (setq org-log-done t)
 
 (require 'ace-window)
-(global-set-key (kbd "M-o") 'ace-window)
+(global-set-key (kbd "C-.") 'ace-window)
 
 (smex-initialize)
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -196,15 +224,41 @@ Inserted by installing org-mode or when a release is made."
 (global-set-key [f8] 'neotree-project-dir)
 (setq insert-directory-program (executable-find "gls"))
 
-(require 'lsp-mode)
-(require 'lsp-python)
-(add-hook 'python-mode-hook #'lsp-python-enable)
-
 (require 'company-quickhelp)
 (company-quickhelp-mode)
+
+ (with-eval-after-load 'company
+  (define-key company-active-map (kbd "C-n") (lambda () (interactive) (company-complete-common-or-cycle 1)))
+  (define-key company-active-map (kbd "C-p") (lambda () (interactive) (company-complete-common-or-cycle -1))))
 
 (require 'god-mode)
 (which-key-enable-god-mode-support)
 (global-set-key (kbd "<escape>") 'god-local-mode)
 
-;;; custom.el ends here
+(defun my-update-cursor ()
+  (setq cursor-type (if (or god-local-mode buffer-read-only)
+                        'hollow-rectangle
+                      'box)))
+
+(add-hook 'god-mode-enabled-hook 'my-update-cursor)
+(add-hook 'god-mode-disabled-hook 'my-update-cursor)
+
+(setq god-exempt-major-modes nil)
+(setq god-exempt-predicates nil)
+
+(global-set-key (kbd "C-'") 'avy-goto-char-2)
+(global-set-key (kbd "M-p") 'avy-pop-mark)
+(global-set-key (kbd "C-;") 'avy-goto-char)
+
+(electric-pair-mode 1)
+(global-set-key [remap kill-ring-save] 'easy-kill)
+
+(global-set-key (kbd "C-,") 'delete-backward-char)
+
+(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(eval-after-load 'sly
+  `(define-key sly-prefix-map (kbd "M-h") 'sly-documentation-lookup))
+
+(setq truncate-lines t)
+
+;;; Custom.el ends here
