@@ -53,6 +53,7 @@ Inserted by installing org-mode or when a release is made."
 		 omnisharp
 		 company
 		 company-quickhelp
+		 company-flx
 		 flycheck
 		 ivy
 		 counsel
@@ -74,11 +75,14 @@ Inserted by installing org-mode or when a release is made."
 		 neotree
 		 yaml-mode
 		 helpful
-		 god-mode
 		 avy
 		 easy-kill
 		 highlight-parentheses
-		 sly))
+					;sly
+		 slime
+		 slime-company
+		 isearch-prop
+		 isearch+))
 
 (dolist (p my-packages)
   (straight-use-package p))
@@ -99,8 +103,8 @@ Inserted by installing org-mode or when a release is made."
 
 (require 'company)
 (eval-after-load
- 'company
- '(add-to-list 'company-backends 'company-omnisharp))
+    'company
+  '(add-to-list 'company-backends 'company-omnisharp))
 
 (defun my-csharp-mode-setup ()
   (omnisharp-mode)
@@ -128,9 +132,11 @@ Inserted by installing org-mode or when a release is made."
 (require 'ivy)
 (setq ivy-use-virtual-buffers t)
 (setq ivy-count-format "(%d/%d) ")
+(setq ivy-re-builders-alist
+      '((t . ivy--regex-plus)))
 (ivy-mode 1)
 
-(global-set-key (kbd "C-s") 'swiper)
+;(Global-set-key (kbd "C-s") 'swiper)
 (global-set-key (kbd "M-x") 'counsel-M-x)
 (global-set-key (kbd "C-x C-f") 'counsel-find-file)
 (global-set-key (kbd "<f1> f") 'counsel-describe-function)
@@ -231,21 +237,6 @@ Inserted by installing org-mode or when a release is made."
   (define-key company-active-map (kbd "C-n") (lambda () (interactive) (company-complete-common-or-cycle 1)))
   (define-key company-active-map (kbd "C-p") (lambda () (interactive) (company-complete-common-or-cycle -1))))
 
-(require 'god-mode)
-(which-key-enable-god-mode-support)
-(global-set-key (kbd "<escape>") 'god-local-mode)
-
-(defun my-update-cursor ()
-  (setq cursor-type (if (or god-local-mode buffer-read-only)
-                        'hollow-rectangle
-                      'box)))
-
-(add-hook 'god-mode-enabled-hook 'my-update-cursor)
-(add-hook 'god-mode-disabled-hook 'my-update-cursor)
-
-(setq god-exempt-major-modes nil)
-(setq god-exempt-predicates nil)
-
 (global-set-key (kbd "C-'") 'avy-goto-char-2)
 (global-set-key (kbd "M-p") 'avy-pop-mark)
 (global-set-key (kbd "C-;") 'avy-goto-char)
@@ -256,9 +247,16 @@ Inserted by installing org-mode or when a release is made."
 (global-set-key (kbd "C-,") 'delete-backward-char)
 
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
-(eval-after-load 'sly
-  `(define-key sly-prefix-map (kbd "M-h") 'sly-documentation-lookup))
+;(eval-after-load 'sly
+					;  `(define-key sly-prefix-map (kbd "M-h") 'sly-documentation-lookup))
+(slime-setup '(slime-fancy slime-company))
 
 (setq truncate-lines t)
+
+(setq projectile-project-search-path '("~/dev"))
+
+(setq ediff-split-window-function 'split-window-horizontally)
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq ediff-diff-options "-w")
 
 ;;; Custom.el ends here
