@@ -78,11 +78,15 @@ Inserted by installing org-mode or when a release is made."
 		 avy
 		 easy-kill
 		 highlight-parentheses
-					;sly
-		 slime
-		 slime-company
+		 sly
+		 ;slime
+		 ;slime-company
 		 isearch-prop
-		 isearch+))
+		 isearch+
+		 org-bullets
+		 org-re-reveal
+		 oer-reveal
+		 notmuch))
 
 (dolist (p my-packages)
   (straight-use-package p))
@@ -204,6 +208,7 @@ Inserted by installing org-mode or when a release is made."
 
 (require 'ace-window)
 (global-set-key (kbd "C-.") 'ace-window)
+(setq aw-scope 'frame)
 
 (smex-initialize)
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -237,9 +242,12 @@ Inserted by installing org-mode or when a release is made."
   (define-key company-active-map (kbd "C-n") (lambda () (interactive) (company-complete-common-or-cycle 1)))
   (define-key company-active-map (kbd "C-p") (lambda () (interactive) (company-complete-common-or-cycle -1))))
 
-(global-set-key (kbd "C-'") 'avy-goto-char-2)
+(setq company-idle-delay 0)
+(setq company-show-numbers t)
+
+(global-set-key (kbd "C-'") 'avy-goto-char-in-line)
 (global-set-key (kbd "M-p") 'avy-pop-mark)
-(global-set-key (kbd "C-;") 'avy-goto-char)
+(global-set-key (kbd "C-;") 'avy-goto-char-2)
 
 (electric-pair-mode 1)
 (global-set-key [remap kill-ring-save] 'easy-kill)
@@ -247,9 +255,9 @@ Inserted by installing org-mode or when a release is made."
 (global-set-key (kbd "C-,") 'delete-backward-char)
 
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
-;(eval-after-load 'sly
-					;  `(define-key sly-prefix-map (kbd "M-h") 'sly-documentation-lookup))
-(slime-setup '(slime-fancy slime-company))
+(eval-after-load 'sly
+  `(define-key sly-prefix-map (kbd "M-h") 'sly-documentation-lookup))
+;(slime-setup '(slime-fancy slime-company))
 
 (setq truncate-lines t)
 
@@ -258,5 +266,17 @@ Inserted by installing org-mode or when a release is made."
 (setq ediff-split-window-function 'split-window-horizontally)
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (setq ediff-diff-options "-w")
+
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+(require 'org-re-reveal)
+(require 'oer-reveal-publish)
+(oer-reveal-setup-submodules t)
+(oer-reveal-generate-include-files t)
+(oer-reveal-publish-setq-defaults)
+
+(autoload 'notmuch "notmuch" "notmuch mail" t)
+(require 'notmuch)
 
 ;;; Custom.el ends here
