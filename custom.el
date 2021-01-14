@@ -3,6 +3,8 @@
 ;;; My first proper Emacs config
 ;;; Code:
 
+(setenv "FrameworkPathOverride" "/Library/Frameworks/Mono.framework/Versions/Current")
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -67,26 +69,21 @@ Inserted by installing org-mode or when a release is made."
 		 which-key
 		 ivy-rich
 		 exec-path-from-shell
-		 ggtags
 		 git-gutter
-		 org-plus-contrib
 		 ace-window
 		 smex
-		 neotree
 		 yaml-mode
 		 helpful
 		 avy
 		 easy-kill
 		 highlight-parentheses
-		 sly
-		 ;slime
-		 ;slime-company
+		 slime
+		 slime-company
 		 isearch-prop
 		 isearch+
 		 org-bullets
-		 org-re-reveal
-		 oer-reveal
-		 notmuch))
+		 shader-mode
+		 ))
 
 (dolist (p my-packages)
   (straight-use-package p))
@@ -123,8 +120,8 @@ Inserted by installing org-mode or when a release is made."
   (setq evil-shift-width 4)
 
   ;csharp-mode README.md recommends this too
-  (electric-pair-mode 1)       ;; Emacs 24
-  (electric-pair-local-mode 1) ;; Emacs 25
+  ;(electric-pair-mode 1)       ;; Emacs 24
+  ;(electric-pair-local-mode 1) ;; Emacs 25
   (electric-indent-mode)
 
   ;(local-set-key (kbd "C-c r r") 'omnisharp-run-code-action-refactoring)
@@ -213,26 +210,8 @@ Inserted by installing org-mode or when a release is made."
 (smex-initialize)
 (global-set-key (kbd "C-x g") 'magit-status)
 
-(require 'neotree)
-
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-(setq neo-smart-open t)
 (setq projectile-switch-project-action 'projectile-dired)
 
-(defun neotree-project-dir ()
-    "Open NeoTree using the git root."
-    (interactive)
-    (let ((project-dir (projectile-project-root))
-          (file-name (buffer-file-name)))
-      (neotree-toggle)
-      (if project-dir
-          (if (neo-global--window-exists-p)
-              (progn
-                (neotree-dir project-dir)
-                (neotree-find file-name)))
-        (message "Could not find git project root."))))
-
-(global-set-key [f8] 'neotree-project-dir)
 (setq insert-directory-program (executable-find "gls"))
 
 (require 'company-quickhelp)
@@ -255,9 +234,7 @@ Inserted by installing org-mode or when a release is made."
 (global-set-key (kbd "C-,") 'delete-backward-char)
 
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
-(eval-after-load 'sly
-  `(define-key sly-prefix-map (kbd "M-h") 'sly-documentation-lookup))
-;(slime-setup '(slime-fancy slime-company))
+(slime-setup '(slime-fancy slime-company))
 
 (setq truncate-lines t)
 
@@ -270,13 +247,43 @@ Inserted by installing org-mode or when a release is made."
 (require 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
-(require 'org-re-reveal)
-(require 'oer-reveal-publish)
-(oer-reveal-setup-submodules t)
-(oer-reveal-generate-include-files t)
-(oer-reveal-publish-setq-defaults)
+(defvar yank-indent-modes '(prog-mode
+                            sgml-mode
+                            js2-mode)
+  "Modes in which to indent regions that are yanked (or yank-popped)")
 
-(autoload 'notmuch "notmuch" "notmuch mail" t)
-(require 'notmuch)
+(defvar yank-advised-indent-threshold 1000
+  "Threshold (# chars) over which indentation does not automatically occur.")
 
+(defun yank-advised-indent-function (beg end)
+  "Do indentation, as long as the region isn't too large."
+  (if (<= (- end beg) yank-advised-indent-threshold)
+      (indent-region beg end nil)))
+
+(defadvice yank (after yank-indent activate)
+  "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
+  (if (and (not (ad-get-arg 0))
+           (--any? (derived-mode-p it) yank-indent-modes))
+      (let ((transient-mark-mode nil))
+        (yank-advised-indent-function (region-beginning) (region-end)))))
+
+(defadvice yank-pop (after yank-pop-indent activate)
+  "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
+  (if (and (not (ad-get-arg 0))
+           (member major-mode yank-indent-modes))
+      (let ((transient-mark-mode nil))
+        (yank-advised-indent-function (region-beginning) (region-end)))))
+
+(defun yank-unindented ()
+  (interactive)
+  (yank 1))
+
+(global-set-key (kbd "M-z") 'zap-up-to-char)
+
+(defun backward-zap-up-to-char (c)
+  "Backward zap up to C."
+  (interactive "cBackward zap up to char:")
+  (zap-up-to-char -1 c))
+
+(global-set-key (kbd "M-Z") 'backward-zap-up-to-char)
 ;;; Custom.el ends here
