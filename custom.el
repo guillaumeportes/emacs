@@ -83,7 +83,6 @@ Inserted by installing org-mode or when a release is made."
 		 isearch+
 		 org-bullets
 		 shader-mode
-		 elpy
 		 ))
 
 (dolist (p my-packages)
@@ -289,5 +288,5 @@ Inserted by installing org-mode or when a release is made."
 (global-set-key (kbd "M-Z") 'backward-zap-up-to-char)
 ;;; Custom.el ends here
 
-(elpy-enable)
 (set-face-font 'default "Hack")
+
