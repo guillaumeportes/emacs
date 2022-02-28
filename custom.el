@@ -21,69 +21,41 @@
 (require 'subr-x)
 (straight-use-package 'git)
 
-(defun org-git-version ()
-  "The Git version of org-mode.
-Inserted by installing org-mode or when a release is made."
-  (require 'git)
-  (let ((git-repo (expand-file-name
-                   "straight/repos/org/" user-emacs-directory)))
-    (string-trim
-     (git-run "describe"
-              "--match=release\*"
-              "--abbrev=6"
-              "HEAD"))))
-
-(defun org-release ()
-  "The release version of org-mode.
-Inserted by installing org-mode or when a release is made."
-  (require 'git)
-  (let ((git-repo (expand-file-name
-                   "straight/repos/org/" user-emacs-directory)))
-    (string-trim
-     (string-remove-prefix
-      "release_"
-      (git-run "describe"
-               "--match=release\*"
-               "--abbrev=0"
-               "HEAD")))))
-
-(provide 'org-version)
-
 (defvar my-packages)
 (setq my-packages '(all-the-icons
-		 doom-themes
-		 omnisharp
-		 company
-		 company-quickhelp
-		 company-flx
-		 flycheck
-		 ivy
-		 counsel
-		 swiper
-		 doom-modeline
-		 projectile
-		 counsel-projectile
-		 perspective
-		 persp-projectile
-		 magit
-		 which-key
-		 ivy-rich
-		 exec-path-from-shell
-		 git-gutter
-		 ace-window
-		 smex
-		 yaml-mode
-		 helpful
-		 avy
-		 easy-kill
-		 highlight-parentheses
-		 slime
-		 slime-company
-		 isearch-prop
-		 isearch+
-		 org-bullets
-		 shader-mode
-		 ))
+		    doom-themes
+		    omnisharp
+		    company
+		    company-quickhelp
+		    company-flx
+		    flycheck
+		    ivy
+		    counsel
+		    swiper
+		    doom-modeline
+		    projectile
+		    counsel-projectile
+		    perspective
+		    persp-projectile
+		    magit
+		    which-key
+		    ivy-rich
+		    exec-path-from-shell
+		    git-gutter
+		    ace-window
+		    smex
+		    yaml-mode
+		    helpful
+		    avy
+		    easy-kill
+		    highlight-parentheses
+		    slime
+		    slime-company
+		    isearch-prop
+		    isearch+
+		    org-bullets
+		    shader-mode
+		    ))
 
 (dolist (p my-packages)
   (straight-use-package p))
@@ -111,7 +83,6 @@ Inserted by installing org-mode or when a release is made."
   (omnisharp-mode)
   (company-mode)
   (flycheck-mode)
-
   (setq indent-tabs-mode nil)
   (setq c-syntactic-indentation t)
   (c-set-style "ellemtel")
@@ -289,4 +260,3 @@ Inserted by installing org-mode or when a release is made."
 ;;; Custom.el ends here
 
 (set-face-font 'default "Hack")
-
