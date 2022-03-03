@@ -1,264 +1,336 @@
 ;;; package --- Summary
 ;;; Commentary:
-;;; My first proper Emacs config
+;;; Emacs config using System Crafters' from scratch series
 ;;; Code:
 
-(setenv "FrameworkPathOverride" "/Library/Frameworks/Mono.framework/Versions/Current")
+(setq inhibit-startup-message t)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(tooltip-mode -1)
+(set-fringe-mode 10)
+(menu-bar-mode -1)
+(setq visible-bell t)
+(set-face-attribute 'default nil :font "Fira Mono" :height 140)
 
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; Initialise package sources
+(require 'package)
 
-(require 'subr-x)
-(straight-use-package 'git)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			  ("org" . "https://orgmode.org/elpa/")
+			  ("elpa" . "https://elpa.gnu.org/packages/")))
 
-(defvar my-packages)
-(setq my-packages '(all-the-icons
-		    doom-themes
-		    omnisharp
-		    company
-		    company-quickhelp
-		    company-flx
-		    flycheck
-		    ivy
-		    counsel
-		    swiper
-		    doom-modeline
-		    projectile
-		    counsel-projectile
-		    perspective
-		    persp-projectile
-		    magit
-		    which-key
-		    ivy-rich
-		    exec-path-from-shell
-		    git-gutter
-		    ace-window
-		    smex
-		    yaml-mode
-		    helpful
-		    avy
-		    easy-kill
-		    highlight-parentheses
-		    slime
-		    slime-company
-		    isearch-prop
-		    isearch+
-		    org-bullets
-		    shader-mode
-		    ))
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
 
-(dolist (p my-packages)
-  (straight-use-package p))
+;; Initialise use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
 
-(define-globalized-minor-mode global-highlight-parentheses-mode
-  highlight-parentheses-mode
-  (lambda ()
-    (highlight-parentheses-mode t)))
-(global-highlight-parentheses-mode t)
+(require 'use-package)
 
-(show-paren-mode t)
+(setq use-package-always-ensure t)
 
-(require 'doom-themes)
-(setq doom-themes-enable-bold t)
-(setq doom-themes-enable-italic t)
-(load-theme 'doom-one t)
-(doom-themes-visual-bell-config)
-
-(require 'company)
-(eval-after-load
-    'company
-  '(add-to-list 'company-backends 'company-omnisharp))
-
-(defun my-csharp-mode-setup ()
-  (omnisharp-mode)
-  (company-mode)
-  (flycheck-mode)
-  (setq indent-tabs-mode nil)
-  (setq c-syntactic-indentation t)
-  (c-set-style "ellemtel")
-  (setq c-basic-offset 4)
-  (setq tab-width 4)
-  (setq evil-shift-width 4)
-
-  ;csharp-mode README.md recommends this too
-  ;(electric-pair-mode 1)       ;; Emacs 24
-  ;(electric-pair-local-mode 1) ;; Emacs 25
-  (electric-indent-mode)
-
-  ;(local-set-key (kbd "C-c r r") 'omnisharp-run-code-action-refactoring)
-					;(local-set-key (kbd "C-c C-c") 'recompile))
-  )
-
-(add-hook 'csharp-mode-hook 'my-csharp-mode-setup t)
-
-(require 'ivy)
-(setq ivy-use-virtual-buffers t)
-(setq ivy-count-format "(%d/%d) ")
-(setq ivy-re-builders-alist
-      '((t . ivy--regex-plus)))
-(ivy-mode 1)
-
-;(Global-set-key (kbd "C-s") 'swiper)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
-(global-set-key (kbd "<f1> f") 'counsel-describe-function)
-(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-(global-set-key (kbd "<f1> l") 'counsel-find-library)
-(global-set-key (kbd "<f2n> i") 'counsel-info-lookup-symbol)
-(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-(global-set-key (kbd "C-c g") 'counsel-git)
-(global-set-key (kbd "C-c j") 'counsel-git-grep)
-(global-set-key (kbd "C-c k") 'counsel-ag)
-(global-set-key (kbd "C-x l") 'counsel-locate)
-(global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-
-(doom-modeline-init)
-
-(require 'projectile)
-(projectile-mode +1)
-(define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
-(setq projectile-enable-caching t)
-
-(counsel-projectile-mode)
-
-(persp-mode)
-
-(define-key projectile-mode-map (kbd "C-c C-p p") 'projectile-persp-switch-project)
-
-(which-key-mode)
-
-(ivy-rich-mode)
-
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
-
-(require 'exec-path-from-shell)
-(require 'shell)
-(setq explicit-shell-file-name "/usr/local/bin/bash")
-(setq projectile-completion-system 'ivy)
-
-(tool-bar-mode 0)
-(scroll-bar-mode 0)
-(global-flycheck-mode)
-(add-hook  'after-init-hook 'global-company-mode)
-(global-hl-line-mode 1)
-(fset 'yes-or-no-p 'y-or-n-p)
-(toggle-frame-maximized)
-(recentf-mode 1)
+(column-number-mode)
 (global-display-line-numbers-mode t)
-(setq display-line-numbers "%4d \u2502 ")
+(dolist (mode '(org-mode-hook
+		term-mode-hook
+		eshell-mode-hook
+		shell-mode-hook
+		vterm-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(require 'git-gutter)
-(global-git-gutter-mode +1)
-(setq inhibit-splash-screen t)
-(transient-mark-mode 1)
+(use-package command-log-mode)
 
-;(setq mac-command-modifier 'meta)
-;(setq mac-option-modifier 'control)
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+	 :map ivy-minibuffer-map
+	 ("TAB" . ivy-alt-done)
+	 ("C-l" . ivy-alt-done)
+	 ("C-j" . ivy-next-line)
+	 ("C-k" . ivy-previous-line)
+	 :map ivy-switch-buffer-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-l" . ivy-done)
+	 ("C-d" . ivy-switch-buffer-kill)
+	 :map ivy-reverse-i-search-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-d" . ivy-reverse-i-search-kill))
+  :init
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-re-builders-alist
+	'((t . ivy--regex-plus)))
+  :config
+  (ivy-mode 1))
 
-(require 'org)
-(setq org-todo-keywords
-      '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(setq org-log-done t)
+(use-package all-the-icons
+  :if (display-graphic-p)
+  :commands all-the-icons-install-fonts
+  :init
+  (unless (find-font (font-spec :name "all-the-icons"))
+    (all-the-icons-install-fonts t)))
 
-(require 'ace-window)
-(global-set-key (kbd "C-.") 'ace-window)
-(setq aw-scope 'frame)
+(use-package all-the-icons-dired
+  :if (display-graphic-p)
+  :hook (dired-mode . all-the-icons-dired-mode))
 
-(smex-initialize)
-(global-set-key (kbd "C-x g") 'magit-status)
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
 
-(setq projectile-switch-project-action 'projectile-dired)
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-one t)
 
-(setq insert-directory-program (executable-find "gls"))
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
-(require 'company-quickhelp)
-(company-quickhelp-mode)
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
- (with-eval-after-load 'company
-  (define-key company-active-map (kbd "C-n") (lambda () (interactive) (company-complete-common-or-cycle 1)))
-  (define-key company-active-map (kbd "C-p") (lambda () (interactive) (company-complete-common-or-cycle -1))))
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
 
-(setq company-idle-delay 0)
-(setq company-show-numbers t)
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :init (all-the-icons-ivy-rich-mode 1))
 
-(global-set-key (kbd "C-'") 'avy-goto-char-in-line)
-(global-set-key (kbd "M-p") 'avy-pop-mark)
-(global-set-key (kbd "C-;") 'avy-goto-char-2)
+(use-package ivy-rich
+  :ensure t
+  :init (ivy-rich-mode 1))
 
-(electric-pair-mode 1)
-(global-set-key [remap kill-ring-save] 'easy-kill)
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x b" . counsel-switch-buffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history)))
 
-(global-set-key (kbd "C-,") 'delete-backward-char)
+(unbind-key "C-," counsel-describe-map)
+(unbind-key "C-." counsel-describe-map)
 
-(setq inferior-lisp-program "/usr/local/bin/sbcl")
-(slime-setup '(slime-fancy slime-company))
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+(setq split-width-threshold 1)
+
+(setq mac-option-modifier 'meta)
+
+(global-set-key (kbd "C-.") 'other-window)
+(global-set-key (kbd "C-,") (kbd "<backspace>"))
+
+(use-package hydra)
+
+(defhydra hydra-other-window (:timeout 4)
+  "other window"
+  ("n" (other-window 1) "next")
+  ("p" (other-window -1) "previous")
+  ("f" nil "finished" :exit t))
+
+(define-key (current-global-map) [remap other-window] (lambda ()
+							(interactive)
+							(other-window 1)
+							(hydra-other-window/body)))
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c C-p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/dev")
+    (setq projectile-project-search-path '("~/dev")))
+  (setq projectile-switch-project-action #'projectile-dired)
+  (setq projectile-enable-caching t))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+(use-package git-gutter
+  :config
+  (git-gutter-mode +1))
+
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (lsp-enable-which-key-integration t)
+  (setq lsp-disabled-clients '(csharp-ls)))
+
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2))
+
+(recentf-mode 1)
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(use-package csharp-mode
+  :ensure t
+  :init
+  :mode "\\.cs\\'"
+  :hook (csharp-mode . lsp-deferred)
+  ;:hook (csharp-mode . (lambda () (c-set-style "ellemtel")))
+  :config
+  (setq tab-width 4)
+  (setq c-basic-offset 4)
+  (setq c-syntactic-indentation t))
+  
 
 (setq truncate-lines t)
 
-(setq projectile-project-search-path '("~/dev"))
+(use-package smex
+  :config
+  (smex-initialize))
 
-(setq ediff-split-window-function 'split-window-horizontally)
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
-(setq ediff-diff-options "-w")
+(use-package exec-path-from-shell
+  :init
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
 
-(require 'org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :hook (emacs-lisp-mode . company-mode)
+  :bind (:map company-active-map
+	      ("<tab>" . company-complete-selection))
+  (:map lsp-mode-map
+	("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0)
+  (company-show-quick-access t))
 
-(defvar yank-indent-modes '(prog-mode
-                            sgml-mode
-                            js2-mode)
-  "Modes in which to indent regions that are yanked (or yank-popped)")
+(use-package company-box
+  :hook (company-mode . company-box-mode))
 
-(defvar yank-advised-indent-threshold 1000
-  "Threshold (# chars) over which indentation does not automatically occur.")
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (setq lsp-ui-doc-position 'bottom)
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-sideline-show-hover nil))
 
-(defun yank-advised-indent-function (beg end)
-  "Do indentation, as long as the region isn't too large."
-  (if (<= (- end beg) yank-advised-indent-threshold)
-      (indent-region beg end nil)))
+(use-package lsp-treemacs
+  :after lsp)
 
-(defadvice yank (after yank-indent activate)
-  "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
-  (if (and (not (ad-get-arg 0))
-           (--any? (derived-mode-p it) yank-indent-modes))
-      (let ((transient-mark-mode nil))
-        (yank-advised-indent-function (region-beginning) (region-end)))))
+(use-package lsp-ivy)
 
-(defadvice yank-pop (after yank-pop-indent activate)
-  "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
-  (if (and (not (ad-get-arg 0))
-           (member major-mode yank-indent-modes))
-      (let ((transient-mark-mode nil))
-        (yank-advised-indent-function (region-beginning) (region-end)))))
+(use-package evil-nerd-commenter
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
-(defun yank-unindented ()
-  (interactive)
-  (yank 1))
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
 
-(global-set-key (kbd "M-z") 'zap-up-to-char)
+(toggle-frame-maximized)
 
-(defun backward-zap-up-to-char (c)
-  "Backward zap up to C."
-  (interactive "cBackward zap up to char:")
-  (zap-up-to-char -1 c))
+(use-package highlight-parentheses
+  :hook (prog-mode . highlight-parentheses-mode))
 
-(global-set-key (kbd "M-Z") 'backward-zap-up-to-char)
-;;; Custom.el ends here
+(use-package vterm
+  :commands vterm
+  :config(setq vterm-max-scrollback 10000))
 
-(set-face-font 'default "Hack")
+(use-package multi-vterm
+  :ensure t)
 
-(setq mac-option-modifier 'meta)
+(defun configure-eshell ()
+  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+  (define-key eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+  (setq eshell-history-size 10000
+	eshell-buffer-maximum-lines 10000
+	eshell-hist-ignoredups t
+	eshell-scroll-to-bottom-on-input t))
+
+(use-package eshell-git-prompt)
+(use-package eshell
+  :hook (eshell-first-time-mode . configure-eshell)
+  :config
+  (with-eval-after-load 'esh-opt
+    (setq eshell-destroy-buffer-when-process-dies t)
+    (setq eshell-visual-commands '("htop" "zsh" "vim")))
+  (eshell-git-prompt-use-theme 'powerline))
+
+(toggle-truncate-lines -1)
+(setq truncate-partial-width-windows nil)
+
+(use-package dap-mode
+  ;; Uncomment the config below if you want all UI panes to be hidden by default!
+  ;; :custom
+  ;; (lsp-enable-dap-auto-configure nil)
+  ;; :config
+  ;; (dap-ui-mode 1)
+
+  :config
+  ;; Set up Node debugging
+  (require 'dap-node)
+  (dap-node-setup)) ;; Automatically installs Node debug adapter if needed
+
+(use-package python-mode
+  :ensure t
+  :hook (python-mode . lsp-deferred)
+  :custom
+  (python-shell-interpreter "/usr/local/bin/python3")
+  (python-shell-completion-native-enable nil)
+  (dap-python-executable "/usr/local/bin/python3")
+  (dap-python-debugger 'debugpy)
+  :config
+  (require 'dap-python))
+
+(use-package yasnippet
+  :config
+  (yas-global-mode 1))
+
+(use-package yasnippet-snippets)
+
+(use-package pyvenv
+  :config(pyvenv-mode 1))
+
+(use-package perspective
+  :bind
+  ("C-x C-b" . persp-list-buffers)   ; or use a nicer switcher, see below
+  :hook (kill-emacs . persp-state-save)
+  :init
+  (persp-mode)
+  :config
+  (setq persp-state-default-file "~/emacs/.perspective"))
+
+(use-package persp-projectile
+  :config
+  (define-key projectile-mode-map (kbd "C-c C-p p") 'projectile-persp-switch-project))
+
+;;; custom.el ends here

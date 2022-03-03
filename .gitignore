@@ -9,3 +9,5 @@ projectile*
 straight
 var
 smex-items
+/.perspective
+/transient/
