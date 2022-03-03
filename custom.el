@@ -260,3 +260,5 @@
 ;;; Custom.el ends here
 
 (set-face-font 'default "Hack")
+
+(setq mac-option-modifier 'meta)
