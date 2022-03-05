@@ -12,6 +12,12 @@
 (setq visible-bell t)
 (set-face-attribute 'default nil :font "Fira Mono" :height 140)
 
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 140)
+
+;; Set the variable pitch face
+(set-face-attribute 'variable-pitch nil :font "Hack" :height 160 :weight 'regular)
+
 ;; Initialise package sources
 (require 'package)
 
@@ -186,6 +192,7 @@
   (setq lsp-keymap-prefix "C-c l")
   :config
   (lsp-enable-which-key-integration t)
+  (setq lsp-signature-render-documentation nil)
   (setq lsp-disabled-clients '(csharp-ls)))
 
 (use-package typescript-mode
@@ -207,7 +214,8 @@
   (setq tab-width 4)
   (setq c-basic-offset 4)
   (setq c-syntactic-indentation t))
-  
+
+(add-hook 'js-mode-hook 'lsp-deferred)
 
 (setq truncate-lines t)
 
@@ -224,6 +232,7 @@
   :after lsp-mode
   :hook (lsp-mode . company-mode)
   :hook (emacs-lisp-mode . company-mode)
+  :hook (prog-mode . company-mode)
   :bind (:map company-active-map
 	      ("<tab>" . company-complete-selection))
   (:map lsp-mode-map
@@ -304,9 +313,15 @@
   :ensure t
   :hook (python-mode . lsp-deferred)
   :custom
-  (python-shell-interpreter "/usr/local/bin/python3")
+  (python-shell-interpreter "ipython")
+  (python-shell-interpreter-args "--colors=Linux --profile=default --simple-prompt --pprint")
+  (python-shell-prompt-regexp "In \\[[0-9]+\\]: ")
+  (python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: ")
+  (python-shell-completion-setup-code "from IPython.core.completerlib import module_completion")
+  (python-shell-completion-module-string-code "';'.join(module_completion('''%s'''))\n")
+  (python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
   (python-shell-completion-native-enable nil)
-  (dap-python-executable "/usr/local/bin/python3")
+  (dap-python-executable "ipython")
   (dap-python-debugger 'debugpy)
   :config
   (require 'dap-python))
@@ -332,5 +347,61 @@
 (use-package persp-projectile
   :config
   (define-key projectile-mode-map (kbd "C-c C-p p") 'projectile-persp-switch-project))
+
+(use-package solidity-mode
+  :config
+  (setq solidity-comment-style 'slash)
+  (define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point))
+
+(use-package solidity-flycheck
+  :config
+  (setq solidity-flycheck-solc-checker-active t)
+  (setq solidity-flycheck-solium-checker-active t)
+  (setq flycheck-solidity-solc-addstd-contracts t))
+
+(use-package company-solidity)
+
+(defun org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1))
+
+(use-package org
+  :hook (org-mode . org-mode-setup)
+  :config
+  (unbind-key "C-," org-mode-map)
+  (setq org-ellipsis " ▾"
+	org-hide-emphasis-markers nil)
+					; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Hack" :weight 'regular :height (cdr face)))
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode))
+
+(defun org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+	visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . org-mode-visual-fill))
 
 ;;; custom.el ends here
