@@ -17,6 +17,10 @@
 
 (setq use-package-always-ensure t)
 
+(setq history-length 25)
+(savehist-mode 1)
+(save-place-mode 1)
+
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
@@ -41,6 +45,12 @@
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil :font "Hack" :height 160 :weight 'regular)
 
+(use-package slime
+  :ensure t
+  :config
+  (require 'slime-autoloads)
+  (setq inferior-lisp-program "/usr/local/bin/sbcl"))
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -59,28 +69,43 @@
       (org-babel-tangle))))
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'org-babel-tangle-config)))
 
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :bind (("C-x C-g" . dired-jump))
+  :custom ((dired-listing-switches "-agho --group-directories-first"))
+  :config
+  (setq insert-directory-program "/usr/local/bin/gls")
+  (setq delete-by-moving-to-trash t))
+
+(use-package dired-single)
+
+(use-package all-the-icons-dired
+  :if (display-graphic-p)
+  :hook (dired-mode . all-the-icons-dired-mode))
+
 (use-package command-log-mode)
 
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
-	 :map ivy-minibuffer-map
-	 ("TAB" . ivy-alt-done)
-	 ("C-l" . ivy-alt-done)
-	 ("C-j" . ivy-next-line)
-	 ("C-k" . ivy-previous-line)
-	 :map ivy-switch-buffer-map
-	 ("C-k" . ivy-previous-line)
-	 ("C-l" . ivy-done)
-	 ("C-d" . ivy-switch-buffer-kill)
-	 :map ivy-reverse-i-search-map
-	 ("C-k" . ivy-previous-line)
-	 ("C-d" . ivy-reverse-i-search-kill))
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
   :init
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-re-builders-alist
-	'((t . ivy--regex-plus)))
+        '((t . ivy--regex-plus)))
   :config
   (ivy-mode 1))
 
@@ -90,10 +115,6 @@
   :init
   (unless (find-font (font-spec :name "all-the-icons"))
     (all-the-icons-install-fonts t)))
-
-(use-package all-the-icons-dired
-  :if (display-graphic-p)
-  :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package doom-modeline
   :ensure t
@@ -137,10 +158,10 @@
 
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
-	 ("C-x b" . counsel-switch-buffer)
-	 ("C-x C-f" . counsel-find-file)
-	 :map minibuffer-local-map
-	 ("C-r" . 'counsel-minibuffer-history)))
+         ("C-x b" . counsel-switch-buffer)
+         ("C-x C-f" . counsel-find-file)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history)))
 
 (unbind-key "C-," counsel-describe-map)
 (unbind-key "C-." counsel-describe-map)
@@ -248,9 +269,9 @@
   :hook (emacs-lisp-mode . company-mode)
   :hook (prog-mode . company-mode)
   :bind (:map company-active-map
-	      ("<tab>" . company-complete-selection))
+              ("<tab>" . company-complete-selection))
   (:map lsp-mode-map
-	("<tab>" . company-indent-or-complete-common))
+        ("<tab>" . company-indent-or-complete-common))
   :custom
   (company-minimum-prefix-length 1)
   (company-idle-delay 0.0)
@@ -295,9 +316,9 @@
   (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
   (define-key eshell-mode-map (kbd "C-r") 'counsel-esh-history)
   (setq eshell-history-size 10000
-	eshell-buffer-maximum-lines 10000
-	eshell-hist-ignoredups t
-	eshell-scroll-to-bottom-on-input t))
+        eshell-buffer-maximum-lines 10000
+        eshell-hist-ignoredups t
+        eshell-scroll-to-bottom-on-input t))
 
 (use-package eshell-git-prompt)
 (use-package eshell
@@ -400,7 +421,7 @@
   :config
   (unbind-key "C-," org-mode-map)
   (setq org-ellipsis " ▾"
-	org-hide-emphasis-markers nil)
+        org-hide-emphasis-markers nil)
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
@@ -408,11 +429,11 @@
   (add-to-list 'org-modules 'org-habit)
   (setq org-habit-graph-column 60)
   (setq org-agenda-files
-	'("~/tasks.org"
-	  "~/birthdays.org"
-	  "~/habits.org"))
+        '("~/tasks.org"
+          "~/birthdays.org"
+          "~/habits.org"))
   (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-			    (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+                            (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
   (setq org-refile-targets
     '(("archive.org" :maxlevel . 1)
@@ -422,66 +443,66 @@
   (advice-add 'org-refile :after 'org-save-all-org-buffers)
 
   (setq org-tag-alist
-	'((:startgroup)
-					; Put mutually exclusive tags here
-	  (:endgroup)
-	  ("@errand" . ?E)
-	  ("@home" . ?H)
-	  ("@work" . ?W)
-	  ("agenda" . ?a)
-	  ("planning" . ?p)
-	  ("publish" . ?P)
-	  ("batch" . ?b)
-	  ("note" . ?n)
-	  ("idea" . ?i)))
+        '((:startgroup)
+                                        ; Put mutually exclusive tags here
+          (:endgroup)
+          ("@errand" . ?E)
+          ("@home" . ?H)
+          ("@work" . ?W)
+          ("agenda" . ?a)
+          ("planning" . ?p)
+          ("publish" . ?P)
+          ("batch" . ?b)
+          ("note" . ?n)
+          ("idea" . ?i)))
 
   ;; Configure custom agenda views
   (setq org-agenda-custom-commands
-	'(("d" "Dashboard"
-	   ((agenda "" ((org-deadline-warning-days 7)))
-	    (todo "NEXT"
-		  ((org-agenda-overriding-header "Next Tasks")))
-	    (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+        '(("d" "Dashboard"
+           ((agenda "" ((org-deadline-warning-days 7)))
+            (todo "NEXT"
+                  ((org-agenda-overriding-header "Next Tasks")))
+            (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
-	  ("n" "Next Tasks"
-	   ((todo "NEXT"
-		  ((org-agenda-overriding-header "Next Tasks")))))
+          ("n" "Next Tasks"
+           ((todo "NEXT"
+                  ((org-agenda-overriding-header "Next Tasks")))))
 
-	  ("W" "Work Tasks" tags-todo "+work-email")
+          ("W" "Work Tasks" tags-todo "+work-email")
 
-	  ;; Low-effort next actions
-	  ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-	   ((org-agenda-overriding-header "Low Effort Tasks")
-	    (org-agenda-max-todos 20)
-	    (org-agenda-files org-agenda-files)))
+          ;; Low-effort next actions
+          ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+           ((org-agenda-overriding-header "Low Effort Tasks")
+            (org-agenda-max-todos 20)
+            (org-agenda-files org-agenda-files)))
 
-	  ("w" "Workflow Status"
-	   ((todo "WAIT"
-		  ((org-agenda-overriding-header "Waiting on External")
-		   (org-agenda-files org-agenda-files)))
-	    (todo "REVIEW"
-		  ((org-agenda-overriding-header "In Review")
-		   (org-agenda-files org-agenda-files)))
-	    (todo "PLAN"
-		  ((org-agenda-overriding-header "In Planning")
-		   (org-agenda-todo-list-sublevels nil)
-		   (org-agenda-files org-agenda-files)))
-	    (todo "BACKLOG"
-		  ((org-agenda-overriding-header "Project Backlog")
-		   (org-agenda-todo-list-sublevels nil)
-		   (org-agenda-files org-agenda-files)))
-	    (todo "READY"
-		  ((org-agenda-overriding-header "Ready for Work")
-		   (org-agenda-files org-agenda-files)))
-	    (todo "ACTIVE"
-		  ((org-agenda-overriding-header "Active Projects")
-		   (org-agenda-files org-agenda-files)))
-	    (todo "COMPLETED"
-		  ((org-agenda-overriding-header "Completed Projects")
-		   (org-agenda-files org-agenda-files)))
-	    (todo "CANC"
-		  ((org-agenda-overriding-header "Cancelled Projects")
-		   (org-agenda-files org-agenda-files)))))))
+          ("w" "Workflow Status"
+           ((todo "WAIT"
+                  ((org-agenda-overriding-header "Waiting on External")
+                   (org-agenda-files org-agenda-files)))
+            (todo "REVIEW"
+                  ((org-agenda-overriding-header "In Review")
+                   (org-agenda-files org-agenda-files)))
+            (todo "PLAN"
+                  ((org-agenda-overriding-header "In Planning")
+                   (org-agenda-todo-list-sublevels nil)
+                   (org-agenda-files org-agenda-files)))
+            (todo "BACKLOG"
+                  ((org-agenda-overriding-header "Project Backlog")
+                   (org-agenda-todo-list-sublevels nil)
+                   (org-agenda-files org-agenda-files)))
+            (todo "READY"
+                  ((org-agenda-overriding-header "Ready for Work")
+                   (org-agenda-files org-agenda-files)))
+            (todo "ACTIVE"
+                  ((org-agenda-overriding-header "Active Projects")
+                   (org-agenda-files org-agenda-files)))
+            (todo "COMPLETED"
+                  ((org-agenda-overriding-header "Completed Projects")
+                   (org-agenda-files org-agenda-files)))
+            (todo "CANC"
+                  ((org-agenda-overriding-header "Cancelled Projects")
+                   (org-agenda-files org-agenda-files)))))))
 
   (setq org-capture-templates
     `(("t" "Tasks / Projects")
@@ -519,7 +540,7 @@
 
 (defun org-mode-visual-fill ()
   (setq visual-fill-column-width 100
-	visual-fill-column-center-text t)
+        visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
