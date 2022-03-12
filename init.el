@@ -20,6 +20,11 @@
 (setq history-length 25)
 (savehist-mode 1)
 (save-place-mode 1)
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+(setq use-dialog-box nil)
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
 
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1)
@@ -44,6 +49,36 @@
 
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil :font "Hack" :height 160 :weight 'regular)
+
+(use-package hydra)
+
+(defvar hydra-resize-window-amount 5)
+
+(defhydra hydra-resize-window ()
+  "resize window"
+  ("i" (enlarge-window hydra-resize-window-amount) "enlarge vertically")
+  ("k" (shrink-window hydra-resize-window-amount) "shrink vertically")
+  ("l" (enlarge-window-horizontally hydra-resize-window-amount) "enlarge horizontally")
+  ("j" (shrink-window-horizontally hydra-resize-window-amount) "shrink horizontally"))
+
+(defhydra hydra-windmove ()
+  "move window"
+  ("i" (windmove-up) "move up")
+  ("k" (windmove-down) "move down")
+  ("j" (windmove-left) "move left")
+  ("l" (windmove-right) "move right"))
+
+(define-prefix-command 'window-key-map)
+(define-key 'window-key-map (kbd "m") 'hydra-windmove/body)
+(define-key 'window-key-map (kbd "s")
+  (lambda ()
+    (interactive)
+    (if (equal nil current-prefix-arg)
+        (setf hydra-resize-window-amount 5)
+      (setf hydra-resize-window-amount current-prefix-arg))
+    (hydra-resize-window/body)))
+
+(global-set-key (kbd "C-c w") 'window-key-map)
 
 (use-package slime
   :ensure t
@@ -183,8 +218,6 @@
 (global-set-key (kbd "C-.") 'other-window)
 (global-set-key (kbd "C->") (lambda () (interactive) (other-window -1)))
 (global-set-key (kbd "C-,") (kbd "<backspace>"))
-
-(use-package hydra)
 
 (defhydra hydra-other-window (:timeout 4)
   "other window"
