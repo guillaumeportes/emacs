@@ -1,3 +1,6 @@
+
+;; straight.el stuff
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -11,25 +14,6 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 (setq package-enable-at-startup nil)
-
-;; Initialise package sources
-(require 'package)
-
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
-
-;; Initialise use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(require 'use-package)
-
-(setq use-package-always-ensure t)
 
 (setq history-length 25)
 (savehist-mode 1)
@@ -63,6 +47,55 @@
 
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil :font "Hack" :height 160 :weight 'regular)
+
+(straight-use-package 'helpful)
+(require 'helpful)
+
+;; Completion
+(straight-use-package 'ivy)
+(require 'ivy)
+(bind-key "C-s" 'swiper)
+(bind-key "TAB" 'ivy-alt-done ivy-minibuffer-map)
+(bind-key "C-l" 'ivy-alt-done ivy-minibuffer-map)
+(bind-key "C-j" 'ivy-next-line ivy-minibuffer-map)
+(bind-key "C-k" 'ivy-previous-line ivy-minibuffer-map)
+(bind-key "C-k" 'ivy-previous-line ivy-switch-buffer-map)
+(bind-key "C-l" 'ivy-done ivy-switch-buffer-map)
+(bind-key "C-d" 'ivy-switch-buffer-kill ivy-switch-buffer-map)
+(bind-key "C-k" 'ivy-previous-line ivy-reverse-i-search-map)
+(bind-key "C-d" 'ivy-reverse-i-search-kill ivy-reverse-i-search-map)
+(setq ivy-use-virtual-buffers t)
+(setq ivy-count-format "(%d/%d) ")
+(setq ivy-re-builders-alist
+      '((t . ivy--regex-plus)))
+(ivy-mode 1)
+
+(straight-use-package 'all-the-icons-ivy-rich)
+(require 'all-the-icons-ivy-rich)
+(all-the-icons-ivy-rich-mode 1)
+
+(straight-use-package 'ivy-rich)
+(require 'ivy-rich)
+(ivy-rich-mode 1)
+
+(straight-use-package 'counsel)
+(require 'counsel)
+(bind-key (kbd "M-x") 'counsel-M-x)
+(bind-key (kbd "C-x b") 'counsel-switch-buffer)
+(bind-key (kbd "C-x C-f") 'counsel-find-file)
+(bind-key (kbd "C-r") 'counsel-minibuffer-history 'minibuffer-local-map)
+(unbind-key "C-," counsel-describe-map)
+(unbind-key "C-." counsel-describe-map)
+
+(setq counsel-describe-function-function #'helpful-callable)
+(setq counsel-describe-variable-function #'helpful-variable)
+(define-key global-map [remap describe-function] 'counsel-describe-function)
+(define-key help-map [remap describe-function] 'counsel-describe-function)
+(define-key global-map [remap describe-command] 'helpful-command)
+(define-key global-map [remap describe-variable] 'counsel-describe-variable)
+(define-key help-map [remap describe-variable] 'counsel-describe-variable)
+(define-key global-map [remap describe-key] 'helpful-key)
+(define-key help-map [remap describe-key] 'helpful-key)
 
 (straight-use-package 'hydra)
 
@@ -129,24 +162,6 @@
 (straight-use-package 'command-log-mode)
 (require 'command-log-mode)
 
-(straight-use-package 'ivy)
-(require 'ivy)
-(bind-key "C-s" 'swiper)
-(bind-key "TAB" 'ivy-alt-done ivy-minibuffer-map)
-(bind-key "C-l" 'ivy-alt-done ivy-minibuffer-map)
-(bind-key "C-j" 'ivy-next-line ivy-minibuffer-map)
-(bind-key "C-k" 'ivy-previous-line ivy-minibuffer-map)
-(bind-key "C-k" 'ivy-previous-line ivy-switch-buffer-map)
-(bind-key "C-l" 'ivy-done ivy-switch-buffer-map)
-(bind-key "C-d" 'ivy-switch-buffer-kill ivy-switch-buffer-map)
-(bind-key "C-k" 'ivy-previous-line ivy-reverse-i-search-map)
-(bind-key "C-d" 'ivy-reverse-i-search-kill ivy-reverse-i-search-map)
-(setq ivy-use-virtual-buffers t)
-(setq ivy-count-format "(%d/%d) ")
-(setq ivy-re-builders-alist
-      '((t . ivy--regex-plus)))
-(ivy-mode 1)
-
 (straight-use-package 'all-the-icons)
 (require 'all-the-icons)
 (unless (find-font (font-spec :name "all-the-icons"))
@@ -186,35 +201,6 @@
 (diminish 'which-key-mode)
 (setq which-key-idle-delay 0.3)
 
-(straight-use-package 'all-the-icons-ivy-rich)
-(require 'all-the-icons-ivy-rich)
-(all-the-icons-ivy-rich-mode 1)
-
-(straight-use-package 'ivy-rich)
-(require 'ivy-rich)
-(ivy-rich-mode 1)
-
-(straight-use-package 'counsel)
-(require 'counsel)
-(bind-key (kbd "M-x") 'counsel-M-x)
-(bind-key (kbd "C-x b") 'counsel-switch-buffer)
-(bind-key (kbd "C-x C-f") 'counsel-find-file)
-(bind-key (kbd "C-r") 'counsel-minibuffer-history 'minibuffer-local-map)
-(unbind-key "C-," counsel-describe-map)
-(unbind-key "C-." counsel-describe-map)
-
-(straight-use-package 'helpful)
-(require 'helpful)
-(setq counsel-describe-function-function #'helpful-callable)
-(setq counsel-describe-variable-function #'helpful-variable)
-(define-key global-map [remap describe-function] 'counsel-describe-function)
-(define-key help-map [remap describe-function] 'counsel-describe-function)
-(define-key global-map [remap describe-command] 'helpful-command)
-(define-key global-map [remap describe-variable] 'counsel-describe-variable)
-(define-key help-map [remap describe-variable] 'counsel-describe-variable)
-(define-key global-map [remap describe-key] 'helpful-key)
-(define-key help-map [remap describe-key] 'helpful-key)
-
 ;(setq split-width-threshold 1)
 
 (setq mac-option-modifier 'meta)
@@ -239,16 +225,16 @@
 (require 'projectile)
 (diminish 'projectile-mode)
 (projectile-mode 1)
-(setq projectile-completion-system 'ivy)
+;(setq projectile-completion-system 'ivy)
 (bind-key (kbd "C-c C-p") 'projectile-command-map)
 (when (file-directory-p "~/dev")
   (setq projectile-project-search-path '("~/dev")))
 (setq projectile-switch-project-action #'projectile-dired)
 (setq projectile-enable-caching t)
 
-(straight-use-package 'counsel-projectile)
-(require 'counsel-projectile)
-(counsel-projectile-mode 1)
+;(straight-use-package 'counsel-projectile)
+;(require 'counsel-projectile)
+;(counsel-projectile-mode 1)
 
 (straight-use-package 'git-gutter)
 (require 'git-gutter)
@@ -310,8 +296,8 @@
 (setq lsp-ui-sideline-enable nil)
 (setq lsp-ui-sideline-show-hover nil)
 
-(straight-use-package 'lsp-ivy)
-(require 'lsp-ivy)
+;(straight-use-package 'lsp-ivy)
+;(require 'lsp-ivy)
 
 (straight-use-package 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
@@ -337,7 +323,7 @@
 (defun configure-eshell ()
   (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
   (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
-  (define-key eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+  ;(define-key eshell-mode-map (kbd "C-r") 'counsel-esh-history)
   (setq eshell-history-size 10000
         eshell-buffer-maximum-lines 10000
         eshell-hist-ignoredups t
