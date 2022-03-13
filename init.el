@@ -1,3 +1,17 @@
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+(setq package-enable-at-startup nil)
+
 ;; Initialise package sources
 (require 'package)
 
@@ -50,7 +64,7 @@
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil :font "Hack" :height 160 :weight 'regular)
 
-(use-package hydra)
+(straight-use-package 'hydra)
 
 (defvar hydra-resize-window-amount 5)
 
@@ -80,11 +94,9 @@
 
 (global-set-key (kbd "C-c w") 'window-key-map)
 
-(use-package slime
-  :ensure t
-  :config
-  (require 'slime-autoloads)
-  (setq inferior-lisp-program "/usr/local/bin/sbcl"))
+(straight-use-package 'slime)
+(require 'slime-autoloads)
+(setq inferior-list-program "usr/local/bin/sbcl")
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -104,112 +116,104 @@
       (org-babel-tangle))))
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'org-babel-tangle-config)))
 
-(use-package dired
-  :ensure nil
-  :commands (dired dired-jump)
-  :bind (("C-x C-g" . dired-jump))
-  :custom ((dired-listing-switches "-agho --group-directories-first"))
-  :config
-  (setq insert-directory-program "/usr/local/bin/gls")
-  (setq delete-by-moving-to-trash t))
+(setq dired-listing-switches "-agho --group-directories-first")
+(setq insert-directory-program "/usr/local/bin/gls")
+(setq delete-by-moving-to-trash t)
+(bind-key (kbd "C-x C-g") 'dired-jump)
 
-(use-package dired-single)
+(straight-use-package 'dired-single)
+(straight-use-package 'all-the-icons-dired)
+(if (display-graphic-p)
+    (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 
-(use-package all-the-icons-dired
-  :if (display-graphic-p)
-  :hook (dired-mode . all-the-icons-dired-mode))
+(straight-use-package 'command-log-mode)
+(require 'command-log-mode)
 
-(use-package command-log-mode)
+(straight-use-package 'ivy)
+(require 'ivy)
+(bind-key "C-s" 'swiper)
+(bind-key "TAB" 'ivy-alt-done ivy-minibuffer-map)
+(bind-key "C-l" 'ivy-alt-done ivy-minibuffer-map)
+(bind-key "C-j" 'ivy-next-line ivy-minibuffer-map)
+(bind-key "C-k" 'ivy-previous-line ivy-minibuffer-map)
+(bind-key "C-k" 'ivy-previous-line ivy-switch-buffer-map)
+(bind-key "C-l" 'ivy-done ivy-switch-buffer-map)
+(bind-key "C-d" 'ivy-switch-buffer-kill ivy-switch-buffer-map)
+(bind-key "C-k" 'ivy-previous-line ivy-reverse-i-search-map)
+(bind-key "C-d" 'ivy-reverse-i-search-kill ivy-reverse-i-search-map)
+(setq ivy-use-virtual-buffers t)
+(setq ivy-count-format "(%d/%d) ")
+(setq ivy-re-builders-alist
+      '((t . ivy--regex-plus)))
+(ivy-mode 1)
 
-(use-package ivy
-  :diminish
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
-  :init
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-re-builders-alist
-        '((t . ivy--regex-plus)))
-  :config
-  (ivy-mode 1))
+(straight-use-package 'all-the-icons)
+(require 'all-the-icons)
+(unless (find-font (font-spec :name "all-the-icons"))
+  (all-the-icons-install-fonts t))
 
-(use-package all-the-icons
-  :if (display-graphic-p)
-  :commands all-the-icons-install-fonts
-  :init
-  (unless (find-font (font-spec :name "all-the-icons"))
-    (all-the-icons-install-fonts t)))
+(straight-use-package 'doom-modeline)
+(require 'doom-modeline)
+(doom-modeline-mode 1)
+;(setq doom-modeline-height 15)
 
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+(straight-use-package 'doom-themes)
+(require 'doom-themes)
+(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+      doom-themes-enable-italic t) ; if nil, italics is universally disabled
+(load-theme 'doom-one t)
 
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-one t)
+;; Enable flashing mode-line on errors
+(doom-themes-visual-bell-config)
+;; Enable custom neotree theme (all-the-icons must be installed!)
+(doom-themes-neotree-config)
+;; or for treemacs users
+(setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+(doom-themes-treemacs-config)
+;; Corrects (and improves) org-mode's native fontification.
+(doom-themes-org-config)
 
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+(straight-use-package 'rainbow-delimiters)
+(require 'rainbow-delimiters)
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+(straight-use-package 'diminish)
+(require 'diminish)
 
-(use-package which-key
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 0.3))
+(straight-use-package 'which-key)
+(require 'which-key)
+(which-key-mode 1)
+(diminish 'which-key-mode)
+(setq which-key-idle-delay 0.3)
 
-(use-package all-the-icons-ivy-rich
-  :ensure t
-  :init (all-the-icons-ivy-rich-mode 1))
+(straight-use-package 'all-the-icons-ivy-rich)
+(require 'all-the-icons-ivy-rich)
+(all-the-icons-ivy-rich-mode 1)
 
-(use-package ivy-rich
-  :ensure t
-  :init (ivy-rich-mode 1))
+(straight-use-package 'ivy-rich)
+(require 'ivy-rich)
+(ivy-rich-mode 1)
 
-(use-package counsel
-  :bind (("M-x" . counsel-M-x)
-         ("C-x b" . counsel-switch-buffer)
-         ("C-x C-f" . counsel-find-file)
-         :map minibuffer-local-map
-         ("C-r" . 'counsel-minibuffer-history)))
-
+(straight-use-package 'counsel)
+(require 'counsel)
+(bind-key (kbd "M-x") 'counsel-M-x)
+(bind-key (kbd "C-x b") 'counsel-switch-buffer)
+(bind-key (kbd "C-x C-f") 'counsel-find-file)
+(bind-key (kbd "C-r") 'counsel-minibuffer-history 'minibuffer-local-map)
 (unbind-key "C-," counsel-describe-map)
 (unbind-key "C-." counsel-describe-map)
 
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+(straight-use-package 'helpful)
+(require 'helpful)
+(setq counsel-describe-function-function #'helpful-callable)
+(setq counsel-describe-variable-function #'helpful-variable)
+(define-key global-map [remap describe-function] 'counsel-describe-function)
+(define-key help-map [remap describe-function] 'counsel-describe-function)
+(define-key global-map [remap describe-command] 'helpful-command)
+(define-key global-map [remap describe-variable] 'counsel-describe-variable)
+(define-key help-map [remap describe-variable] 'counsel-describe-variable)
+(define-key global-map [remap describe-key] 'helpful-key)
+(define-key help-map [remap describe-key] 'helpful-key)
 
 ;(setq split-width-threshold 1)
 
@@ -217,6 +221,7 @@
 
 (global-set-key (kbd "C-.") 'other-window)
 (global-set-key (kbd "C->") (lambda () (interactive) (other-window -1)))
+
 (global-set-key (kbd "C-,") (kbd "<backspace>"))
 
 (defhydra hydra-other-window (:timeout 4)
@@ -230,119 +235,104 @@
 ;							(other-window 1)
 ;							(hydra-other-window/body)))
 
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :custom ((projectile-completion-system 'ivy))
-  :bind-keymap
-  ("C-c C-p" . projectile-command-map)
-  :init
-  (when (file-directory-p "~/dev")
-    (setq projectile-project-search-path '("~/dev")))
-  (setq projectile-switch-project-action #'projectile-dired)
-  (setq projectile-enable-caching t))
+(straight-use-package 'projectile)
+(require 'projectile)
+(diminish 'projectile-mode)
+(projectile-mode 1)
+(setq projectile-completion-system 'ivy)
+(bind-key (kbd "C-c C-p") 'projectile-command-map)
+(when (file-directory-p "~/dev")
+  (setq projectile-project-search-path '("~/dev")))
+(setq projectile-switch-project-action #'projectile-dired)
+(setq projectile-enable-caching t)
 
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
+(straight-use-package 'counsel-projectile)
+(require 'counsel-projectile)
+(counsel-projectile-mode 1)
 
-(use-package git-gutter
-  :config
-  (git-gutter-mode +1))
+(straight-use-package 'git-gutter)
+(require 'git-gutter)
+(git-gutter-mode +1)
 
-(use-package magit
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+(straight-use-package 'magit)
+(require 'magit)
+(setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 
-
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :config
-  (lsp-enable-which-key-integration t)
-  (setq lsp-signature-render-documentation nil)
-  (setq lsp-disabled-clients '(csharp-ls)))
-
-(use-package typescript-mode
-  :mode "\\.ts\\'"
-  :hook (typescript-mode . lsp-deferred)
-  :config
-  (setq typescript-indent-level 2))
+(straight-use-package 'lsp-mode)
+(require 'lsp-mode)
+(setq lsp-keymap-prefix "C-c l")
+(lsp-enable-which-key-integration t)
+(setq lsp-signature-render-documentation nil)
+(setq lsp-disabled-clients '(csharp-ls))
 
 (recentf-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-(use-package csharp-mode
-  :ensure t
-  :init
-  :mode "\\.cs\\'"
-  :hook (csharp-mode . lsp-deferred)
-  ;:hook (csharp-mode . (lambda () (c-set-style "ellemtel")))
-  :config
-  (setq tab-width 4)
-  (setq c-basic-offset 4)
-  (setq c-syntactic-indentation t))
+(straight-use-package 'csharp-mode)
+(require 'csharp-mode)
+(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
+(setq tab-width 4)
+(setq c-basic-offset 4)
+(setq c-syntactic-indentation t)
 
+(add-hook 'csharp-mode-hook 'lsp-deferred)
 (add-hook 'js-mode-hook 'lsp-deferred)
 
 (setq truncate-lines t)
 
-(use-package smex
-  :config
-  (smex-initialize))
+(straight-use-package 'smex)
+(require 'smex)
+(smex-initialize)
 
-(use-package exec-path-from-shell
-  :init
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize)))
+(straight-use-package 'exec-path-from-shell)
+(require 'exec-path-from-shell)
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
 
-(use-package company
-  :after lsp-mode
-  :hook (lsp-mode . company-mode)
-  :hook (emacs-lisp-mode . company-mode)
-  :hook (prog-mode . company-mode)
-  :bind (:map company-active-map
-              ("<tab>" . company-complete-selection))
-  (:map lsp-mode-map
-        ("<tab>" . company-indent-or-complete-common))
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0)
-  (company-show-quick-access t))
+(straight-use-package 'company)
+(require 'company)
+(add-hook 'lsp-mode-hook 'company-mode)
+(add-hook 'prog-mode-hook 'company-mode)
+(bind-key (kbd "<tab>") 'company-complete-selection 'company-mode-map)
+(bind-key (kbd "<tab>") 'company-indent-or-complete-common 'lsp-mode-map)
+(setq company-minimum-prefix-length 1)
+(setq company-idle-delay 0.0)
+(setq company-show-quick-access t)
 
-(use-package company-box
-  :hook (company-mode . company-box-mode))
+(straight-use-package 'company-box)
+(require 'company-box)
+(add-hook 'company-mode-hook 'company-box-mode)
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (setq lsp-ui-doc-position 'bottom)
-  (setq lsp-ui-sideline-enable nil)
-  (setq lsp-ui-sideline-show-hover nil))
+(straight-use-package 'lsp-ui)
+(require 'lsp-ui)
+(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+(setq lsp-ui-doc-position 'bottom)
+(setq lsp-ui-sideline-enable nil)
+(setq lsp-ui-sideline-show-hover nil)
 
-(use-package lsp-treemacs
-  :after lsp)
+(straight-use-package 'lsp-ivy)
+(require 'lsp-ivy)
 
-(use-package lsp-ivy)
+(straight-use-package 'evil-nerd-commenter)
+(require 'evil-nerd-commenter)
+(bind-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
 
-(use-package evil-nerd-commenter
-  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
-(use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode))
+(straight-use-package 'flycheck)
+(require 'flycheck)
+(global-flycheck-mode 1)
 
 (toggle-frame-maximized)
 
-(use-package highlight-parentheses
-  :hook (prog-mode . highlight-parentheses-mode))
+(straight-use-package 'highlight-parentheses)
+(require 'highlight-parentheses)
+(add-hook 'prog-mode-hook 'highlight-parentheses-mode)
 
-(use-package vterm
-  :commands vterm
-  :config(setq vterm-max-scrollback 10000))
+(straight-use-package 'vterm)
+(require 'vterm)
+(setq vterm-max-scrollback 10000)
 
-(use-package multi-vterm
-  :ensure t)
+(straight-use-package 'multi-vterm)
+(require 'multi-vterm)
 
 (defun configure-eshell ()
   (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
@@ -353,75 +343,60 @@
         eshell-hist-ignoredups t
         eshell-scroll-to-bottom-on-input t))
 
-(use-package eshell-git-prompt)
-(use-package eshell
-  :hook (eshell-first-time-mode . configure-eshell)
-  :config
-  (with-eval-after-load 'esh-opt
-    (setq eshell-destroy-buffer-when-process-dies t)
-    (setq eshell-visual-commands '("htop" "zsh" "vim")))
-  (eshell-git-prompt-use-theme 'powerline))
+
+
+(add-hook 'eshell-first-time-mode-hook 'configure-eshell)
+(with-eval-after-load 'esh-opt
+  (setq eshell-destroy-buffer-when-process-dies t)
+  (setq eshell-visual-commands '("htop" "zsh" "vim")))
+(eshell-git-prompt-use-theme 'powerline)
+
+(straight-use-package 'eshell-git-prompt)
+(require 'eshell-git-prompt)
 
 (toggle-truncate-lines -1)
 (setq truncate-partial-width-windows nil)
 
-(use-package dap-mode
-  ;; Uncomment the config below if you want all UI panes to be hidden by default!
-  ;; :custom
-  ;; (lsp-enable-dap-auto-configure nil)
-  ;; :config
-  ;; (dap-ui-mode 1)
+(straight-use-package 'python-mode)
+(require 'python-mode)
+(add-hook 'python-mode-hook 'lsp-deferred)
+(setq python-shell-interpreter "ipython")
+(setq python-shell-interpreter-args "--colors=Linux --profile=default --simple-prompt --pprint")
+(setq python-shell-prompt-regexp "In \\[[0-9]+\\]: ")
+(setq python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: ")
+(setq python-shell-completion-setup-code "from IPython.core.completerlib import module_completion")
+(setq python-shell-completion-module-string-code "';'.join(module_completion('''%s'''))\n")
+(setq python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
+(setq python-shell-completion-native-enable nil)
 
-  :config
-  ;; Set up Node debugging
-  (require 'dap-node)
-  (dap-node-setup)) ;; Automatically installs Node debug adapter if needed
+(straight-use-package 'pyvenv)
+(require 'pyvenv)
+(pyvenv-mode 1)
 
-(use-package python-mode
-  :ensure t
-  :hook (python-mode . lsp-deferred)
-  :custom
-  (python-shell-interpreter "ipython")
-  (python-shell-interpreter-args "--colors=Linux --profile=default --simple-prompt --pprint")
-  (python-shell-prompt-regexp "In \\[[0-9]+\\]: ")
-  (python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: ")
-  (python-shell-completion-setup-code "from IPython.core.completerlib import module_completion")
-  (python-shell-completion-module-string-code "';'.join(module_completion('''%s'''))\n")
-  (python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
-  (python-shell-completion-native-enable nil)
-  (dap-python-executable "ipython")
-  (dap-python-debugger 'debugpy)
-  :config
-  (require 'dap-python))
+(straight-use-package 'perspective)
+(require 'perspective)
+(bind-key (kbd "C-x C-b") 'persp-list-buffers)
+(add-hook 'kill-emacs-hook 'persp-state-save)
+(persp-mode 1)
+(setq persp-state-default-file "~/emacs/.perspective")
 
-(use-package pyvenv
-  :config(pyvenv-mode 1))
+(straight-use-package 'persp-projectile)
+(require 'persp-projectile)
+(define-key projectile-mode-map (kbd "C-c C-p p") 'projectile-persp-switch-project)
 
-(use-package perspective
-  :bind
-  ("C-x C-b" . persp-list-buffers)   ; or use a nicer switcher, see below
-  :hook (kill-emacs . persp-state-save)
-  :init
-  (persp-mode)
-  :config
-  (setq persp-state-default-file "~/emacs/.perspective"))
+(straight-use-package 'solidity-mode)
+(require 'solidity-mode)
+(setq solidity-comment-style 'slash)
+(define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point)
 
-(use-package persp-projectile
-  :config
-  (define-key projectile-mode-map (kbd "C-c C-p p") 'projectile-persp-switch-project))
+(straight-use-package 'solidity-flycheck)
+(require 'solidity-flycheck)
+(setq solidity-flycheck-solc-checker-active t)
+(setq solidity-flycheck-solium-checker-active t)
+(setq flycheck-solidity-solc-addstd-contracts t)
 
-(use-package solidity-mode
-  :config
-  (setq solidity-comment-style 'slash)
-  (define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point))
-
-(use-package solidity-flycheck
-  :config
-  (setq solidity-flycheck-solc-checker-active t)
-  (setq solidity-flycheck-solium-checker-active t)
-  (setq flycheck-solidity-solc-addstd-contracts t))
-
-(use-package company-solidity)
+(straight-use-package 'company-solidity)
+(require 'company-solidity)
 
 (defun org-mode-setup ()
   (org-indent-mode)
@@ -449,132 +424,131 @@
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
-(use-package org
-  :hook (org-mode . org-mode-setup)
-  :config
-  (unbind-key "C-," org-mode-map)
-  (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers nil)
-  (setq org-agenda-start-with-log-mode t)
-  (setq org-log-done 'time)
-  (setq org-log-into-drawer t)
-  (require 'org-habit)
-  (add-to-list 'org-modules 'org-habit)
-  (setq org-habit-graph-column 60)
-  (setq org-agenda-files
-        '("~/tasks.org"
-          "~/birthdays.org"
-          "~/habits.org"))
-  (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-                            (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+(add-hook 'org-mode-hook 'org-mode-setup)
+(unbind-key "C-," org-mode-map)
+(setq org-ellipsis " ▾"
+      org-hide-emphasis-markers nil)
+(setq org-agenda-start-with-log-mode t)
+(setq org-log-done 'time)
+(setq org-log-into-drawer t)
+(require 'org-habit)
+(add-to-list 'org-modules 'org-habit)
+(setq org-habit-graph-column 60)
+(setq org-agenda-files
+      '("~/tasks.org"
+        "~/birthdays.org"
+        "~/habits.org"))
+(setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+                          (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
-  (setq org-refile-targets
-    '(("archive.org" :maxlevel . 1)
-      ("tasks.org" :maxlevel . 1)))
+(setq org-refile-targets
+      '(("archive.org" :maxlevel . 1)
+	("tasks.org" :maxlevel . 1)))
 
-  ;; Save Org buffers after refiling!
-  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+;; Save Org buffers after refiling!
+(advice-add 'org-refile :after 'org-save-all-org-buffers)
 
-  (setq org-tag-alist
-        '((:startgroup)
+(setq org-tag-alist
+      '((:startgroup)
                                         ; Put mutually exclusive tags here
-          (:endgroup)
-          ("@errand" . ?E)
-          ("@home" . ?H)
-          ("@work" . ?W)
-          ("agenda" . ?a)
-          ("planning" . ?p)
-          ("publish" . ?P)
-          ("batch" . ?b)
-          ("note" . ?n)
-          ("idea" . ?i)))
+        (:endgroup)
+        ("@errand" . ?E)
+        ("@home" . ?H)
+        ("@work" . ?W)
+        ("agenda" . ?a)
+        ("planning" . ?p)
+        ("publish" . ?P)
+        ("batch" . ?b)
+        ("note" . ?n)
+        ("idea" . ?i)))
 
-  ;; Configure custom agenda views
-  (setq org-agenda-custom-commands
-        '(("d" "Dashboard"
-           ((agenda "" ((org-deadline-warning-days 7)))
-            (todo "NEXT"
-                  ((org-agenda-overriding-header "Next Tasks")))
-            (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+;; Configure custom agenda views
+(setq org-agenda-custom-commands
+      '(("d" "Dashboard"
+         ((agenda "" ((org-deadline-warning-days 7)))
+          (todo "NEXT"
+                ((org-agenda-overriding-header "Next Tasks")))
+          (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+	
+        ("n" "Next Tasks"
+         ((todo "NEXT"
+                ((org-agenda-overriding-header "Next Tasks")))))
 
-          ("n" "Next Tasks"
-           ((todo "NEXT"
-                  ((org-agenda-overriding-header "Next Tasks")))))
+        ("W" "Work Tasks" tags-todo "+work-email")
 
-          ("W" "Work Tasks" tags-todo "+work-email")
+        ;; Low-effort next actions
+        ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+         ((org-agenda-overriding-header "Low Effort Tasks")
+          (org-agenda-max-todos 20)
+          (org-agenda-files org-agenda-files)))
 
-          ;; Low-effort next actions
-          ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-           ((org-agenda-overriding-header "Low Effort Tasks")
-            (org-agenda-max-todos 20)
-            (org-agenda-files org-agenda-files)))
+        ("w" "Workflow Status"
+         ((todo "WAIT"
+                ((org-agenda-overriding-header "Waiting on External")
+                 (org-agenda-files org-agenda-files)))
+          (todo "REVIEW"
+                ((org-agenda-overriding-header "In Review")
+                 (org-agenda-files org-agenda-files)))
+          (todo "PLAN"
+                ((org-agenda-overriding-header "In Planning")
+                 (org-agenda-todo-list-sublevels nil)
+                 (org-agenda-files org-agenda-files)))
+          (todo "BACKLOG"
+                ((org-agenda-overriding-header "Project Backlog")
+                 (org-agenda-todo-list-sublevels nil)
+                 (org-agenda-files org-agenda-files)))
+          (todo "READY"
+                ((org-agenda-overriding-header "Ready for Work")
+                 (org-agenda-files org-agenda-files)))
+          (todo "ACTIVE"
+                ((org-agenda-overriding-header "Active Projects")
+                 (org-agenda-files org-agenda-files)))
+          (todo "COMPLETED"
+                ((org-agenda-overriding-header "Completed Projects")
+                 (org-agenda-files org-agenda-files)))
+          (todo "CANC"
+                ((org-agenda-overriding-header "Cancelled Projects")
+                 (org-agenda-files org-agenda-files)))))))
 
-          ("w" "Workflow Status"
-           ((todo "WAIT"
-                  ((org-agenda-overriding-header "Waiting on External")
-                   (org-agenda-files org-agenda-files)))
-            (todo "REVIEW"
-                  ((org-agenda-overriding-header "In Review")
-                   (org-agenda-files org-agenda-files)))
-            (todo "PLAN"
-                  ((org-agenda-overriding-header "In Planning")
-                   (org-agenda-todo-list-sublevels nil)
-                   (org-agenda-files org-agenda-files)))
-            (todo "BACKLOG"
-                  ((org-agenda-overriding-header "Project Backlog")
-                   (org-agenda-todo-list-sublevels nil)
-                   (org-agenda-files org-agenda-files)))
-            (todo "READY"
-                  ((org-agenda-overriding-header "Ready for Work")
-                   (org-agenda-files org-agenda-files)))
-            (todo "ACTIVE"
-                  ((org-agenda-overriding-header "Active Projects")
-                   (org-agenda-files org-agenda-files)))
-            (todo "COMPLETED"
-                  ((org-agenda-overriding-header "Completed Projects")
-                   (org-agenda-files org-agenda-files)))
-            (todo "CANC"
-                  ((org-agenda-overriding-header "Cancelled Projects")
-                   (org-agenda-files org-agenda-files)))))))
+(setq org-capture-templates
+      `(("t" "Tasks / Projects")
+	("tt" "Task" entry (file+olp "~/tasks.org" "Inbox")
+         "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
-  (setq org-capture-templates
-    `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "~/tasks.org" "Inbox")
-           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+	("j" "Journal Entries")
+	("jj" "Journal" entry
+         (file+olp+datetree "~/journal.org")
+         "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
+	("jm" "Meeting" entry
+         (file+olp+datetree "~/journal.org")
+         "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
 
-      ("j" "Journal Entries")
-      ("jj" "Journal" entry
-           (file+olp+datetree "~/journal.org")
-           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-           :clock-in :clock-resume
-           :empty-lines 1)
-      ("jm" "Meeting" entry
-           (file+olp+datetree "~/journal.org")
-           "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-           :clock-in :clock-resume
-           :empty-lines 1)
+	("w" "Workflows")
+	("we" "Checking Email" entry (file+olp+datetree "~/journal.org")
+         "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
-      ("w" "Workflows")
-      ("we" "Checking Email" entry (file+olp+datetree "~/journal.org")
-           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+	("m" "Metrics Capture")
+	("mw" "Weight" table-line (file+headline "~/metrics.org" "Weight")
+	 "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
 
-      ("m" "Metrics Capture")
-      ("mw" "Weight" table-line (file+headline "~/metrics.org" "Weight")
-       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+(define-key global-map (kbd "C-c j")
+  (lambda () (interactive) (org-capture nil "jj")))
 
-  (define-key global-map (kbd "C-c j")
-    (lambda () (interactive) (org-capture nil "jj")))
+(org-mode-font-setup)
 
-  (org-mode-font-setup))
-
-(use-package org-bullets
-  :after org
-  :hook (org-mode . org-bullets-mode))
+(straight-use-package 'org-bullets)
+(require 'org-bullets)
+(add-hook 'org-mode-hook 'org-bullets-mode)
 
 (defun org-mode-visual-fill ()
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
-(use-package visual-fill-column
-  :hook (org-mode . org-mode-visual-fill))
+(straight-use-package 'visual-fill-column)
+(require 'visual-fill-column)
+(add-hook 'org-mode-hook 'org-mode-visual-fill)
