@@ -68,6 +68,11 @@
 (require 'orderless)
 (setq completion-styles '(orderless))
 
+(straight-use-package 'marginalia)
+(require 'marginalia)
+(define-key minibuffer-local-map (kbd "M-A") 'marginalia-cycle)
+(marginalia-mode 1)
+
 ;; (straight-use-package 'ivy)
 ;; (require 'ivy)
 ;; (bind-key "C-s" 'swiper)
