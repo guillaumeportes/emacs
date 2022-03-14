@@ -73,6 +73,18 @@
 (define-key minibuffer-local-map (kbd "M-A") 'marginalia-cycle)
 (marginalia-mode 1)
 
+(straight-use-package 'consult)
+(require 'consult)
+(global-set-key (kbd "C-x b") 'consult-buffer)
+(global-set-key (kbd "C-y") 'consult-yank-from-kill-ring)
+(global-set-key (kbd "M-y") 'consult-yank-pop)
+(global-set-key (kbd "M-g g") 'consult-goto-line)
+(global-set-key (kbd "M-g M-g") 'consult-goto-line)
+(global-set-key (kbd "M-g m") 'consult-mark)
+(global-set-key (kbd "M-g i") 'consult-imenu)
+(global-set-key (kbd "C-s") 'consult-line)
+(global-set-key (kbd "C-S-s") 'consult-line-multi)
+
 ;; (straight-use-package 'ivy)
 ;; (require 'ivy)
 ;; (bind-key "C-s" 'swiper)
