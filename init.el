@@ -85,6 +85,15 @@
 (global-set-key (kbd "C-s") 'consult-line)
 (global-set-key (kbd "C-S-s") 'consult-line-multi)
 
+(straight-use-package 'embark)
+(require 'embark)
+(global-set-key (kbd "C-:") 'embark-act)
+(global-set-key (kbd "C-h B") 'embark-bindings)
+
+(straight-use-package 'embark-consult)
+(require 'embark-consult)
+(add-hook 'embark-collect-mode-hook 'consult-preview-at-point-mode)
+
 ;; (straight-use-package 'ivy)
 ;; (require 'ivy)
 ;; (bind-key "C-s" 'swiper)
