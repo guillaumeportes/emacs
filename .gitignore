@@ -11,3 +11,7 @@ var
 smex-items
 /.perspective
 /transient/
+/eshell/
+/history
+/places
+/projects
