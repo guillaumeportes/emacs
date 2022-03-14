@@ -1,4 +1,4 @@
-
+;; -*- lexical-binding: t -*-
 ;; straight.el stuff
 
 (defvar bootstrap-version)
@@ -51,51 +51,91 @@
 (straight-use-package 'helpful)
 (require 'helpful)
 
+(global-set-key (kbd "C-h f") #'helpful-callable)
+(global-set-key (kbd "C-h v") #'helpful-variable)
+(global-set-key (kbd "C-h k") #'helpful-key)
+(global-set-key (kbd "C-c C-d") #'helpful-at-point)
+(global-set-key (kbd "C-h F") #'helpful-function)
+(global-set-key (kbd "C-h C") #'helpful-command)
+
+(savehist-mode 1)
+
 ;; Completion
-(straight-use-package 'ivy)
-(require 'ivy)
-(bind-key "C-s" 'swiper)
-(bind-key "TAB" 'ivy-alt-done ivy-minibuffer-map)
-(bind-key "C-l" 'ivy-alt-done ivy-minibuffer-map)
-(bind-key "C-j" 'ivy-next-line ivy-minibuffer-map)
-(bind-key "C-k" 'ivy-previous-line ivy-minibuffer-map)
-(bind-key "C-k" 'ivy-previous-line ivy-switch-buffer-map)
-(bind-key "C-l" 'ivy-done ivy-switch-buffer-map)
-(bind-key "C-d" 'ivy-switch-buffer-kill ivy-switch-buffer-map)
-(bind-key "C-k" 'ivy-previous-line ivy-reverse-i-search-map)
-(bind-key "C-d" 'ivy-reverse-i-search-kill ivy-reverse-i-search-map)
-(setq ivy-use-virtual-buffers t)
-(setq ivy-count-format "(%d/%d) ")
-(setq ivy-re-builders-alist
-      '((t . ivy--regex-plus)))
-(ivy-mode 1)
 
-(straight-use-package 'all-the-icons-ivy-rich)
-(require 'all-the-icons-ivy-rich)
-(all-the-icons-ivy-rich-mode 1)
 
-(straight-use-package 'ivy-rich)
-(require 'ivy-rich)
-(ivy-rich-mode 1)
+;; (straight-use-package 'ivy)
+;; (require 'ivy)
+;; (bind-key "C-s" 'swiper)
+;; (bind-key "TAB" 'ivy-alt-done ivy-minibuffer-map)
+;; (bind-key "C-l" 'ivy-alt-done ivy-minibuffer-map)
+;; (bind-key "C-j" 'ivy-next-line ivy-minibuffer-map)
+;; (bind-key "C-k" 'ivy-previous-line ivy-minibuffer-map)
+;; (bind-key "C-k" 'ivy-previous-line ivy-switch-buffer-map)
+;; (bind-key "C-l" 'ivy-done ivy-switch-buffer-map)
+;; (bind-key "C-d" 'ivy-switch-buffer-kill ivy-switch-buffer-map)
+;; (bind-key "C-k" 'ivy-previous-line ivy-reverse-i-search-map)
+;; (bind-key "C-d" 'ivy-reverse-i-search-kill ivy-reverse-i-search-map)
+;; (setq ivy-use-virtual-buffers t)
+;; (setq ivy-count-format "(%d/%d) ")
+;; (setq ivy-re-builders-alist
+;;       '((t . ivy--regex-plus)))
+;; (ivy-mode 1)
 
-(straight-use-package 'counsel)
-(require 'counsel)
-(bind-key (kbd "M-x") 'counsel-M-x)
-(bind-key (kbd "C-x b") 'counsel-switch-buffer)
-(bind-key (kbd "C-x C-f") 'counsel-find-file)
-(bind-key (kbd "C-r") 'counsel-minibuffer-history 'minibuffer-local-map)
-(unbind-key "C-," counsel-describe-map)
-(unbind-key "C-." counsel-describe-map)
+;; (straight-use-package 'all-the-icons-ivy-rich)
+;; (require 'all-the-icons-ivy-rich)
+;; (all-the-icons-ivy-rich-mode 1)
 
-(setq counsel-describe-function-function #'helpful-callable)
-(setq counsel-describe-variable-function #'helpful-variable)
-(define-key global-map [remap describe-function] 'counsel-describe-function)
-(define-key help-map [remap describe-function] 'counsel-describe-function)
-(define-key global-map [remap describe-command] 'helpful-command)
-(define-key global-map [remap describe-variable] 'counsel-describe-variable)
-(define-key help-map [remap describe-variable] 'counsel-describe-variable)
-(define-key global-map [remap describe-key] 'helpful-key)
-(define-key help-map [remap describe-key] 'helpful-key)
+;; (straight-use-package 'ivy-rich)
+;; (require 'ivy-rich)
+;; (ivy-rich-mode 1)
+
+;; (straight-use-package 'counsel)
+;; (require 'counsel)
+;; (bind-key (kbd "M-x") 'counsel-M-x)
+;; (bind-key (kbd "C-x b") 'counsel-switch-buffer)
+;; (bind-key (kbd "C-x C-f") 'counsel-find-file)
+;; (bind-key (kbd "C-r") 'counsel-minibuffer-history 'minibuffer-local-map)
+;; (unbind-key "C-," counsel-describe-map)
+;; (unbind-key "C-." counsel-describe-map)
+
+;; (setq counsel-describe-function-function #'helpful-callable)
+;; (setq counsel-describe-variable-function #'helpful-variable)
+;; (define-key global-map [remap describe-function] 'counsel-describe-function)
+;; (define-key help-map [remap describe-function] 'counsel-describe-function)
+;; (define-key global-map [remap describe-command] 'helpful-command)
+;; (define-key global-map [remap describe-variable] 'counsel-describe-variable)
+;; (define-key help-map [remap describe-variable] 'counsel-describe-variable)
+;; (define-key global-map [remap describe-key] 'helpful-key)
+;; (define-key help-map [remap describe-key] 'helpful-key)
+
+;; Project management
+
+;; (straight-use-package 'projectile)
+;; (require 'projectile)
+;; (diminish 'projectile-mode)
+;; (projectile-mode 1)
+;; (setq projectile-completion-system 'ivy)
+;; (bind-key (kbd "C-c C-p") 'projectile-command-map)
+;; (when (file-directory-p "~/dev")
+;;   (setq projectile-project-search-path '("~/dev")))
+;; (setq projectile-switch-project-action #'projectile-dired)
+;; (setq projectile-enable-caching t)
+;; (straight-use-package 'counsel-projectile)
+;; (require 'counsel-projectile)
+;; (counsel-projectile-mode 1)
+
+;; Window management
+
+;; (straight-use-package 'perspective)
+;; (require 'perspective)
+;; (bind-key (kbd "C-x C-b") 'persp-list-buffers)
+;; (add-hook 'kill-emacs-hook 'persp-state-save)
+;; (persp-mode 1)
+;; (setq persp-state-default-file "~/emacs/.perspective")
+
+;; (straight-use-package 'persp-projectile)
+;; (require 'persp-projectile)
+;; (define-key projectile-mode-map (kbd "C-c C-p p") 'projectile-persp-switch-project)
 
 (straight-use-package 'hydra)
 
@@ -221,21 +261,6 @@
 ;							(other-window 1)
 ;							(hydra-other-window/body)))
 
-(straight-use-package 'projectile)
-(require 'projectile)
-(diminish 'projectile-mode)
-(projectile-mode 1)
-;(setq projectile-completion-system 'ivy)
-(bind-key (kbd "C-c C-p") 'projectile-command-map)
-(when (file-directory-p "~/dev")
-  (setq projectile-project-search-path '("~/dev")))
-(setq projectile-switch-project-action #'projectile-dired)
-(setq projectile-enable-caching t)
-
-;(straight-use-package 'counsel-projectile)
-;(require 'counsel-projectile)
-;(counsel-projectile-mode 1)
-
 (straight-use-package 'git-gutter)
 (require 'git-gutter)
 (git-gutter-mode +1)
@@ -358,17 +383,6 @@
 (straight-use-package 'pyvenv)
 (require 'pyvenv)
 (pyvenv-mode 1)
-
-(straight-use-package 'perspective)
-(require 'perspective)
-(bind-key (kbd "C-x C-b") 'persp-list-buffers)
-(add-hook 'kill-emacs-hook 'persp-state-save)
-(persp-mode 1)
-(setq persp-state-default-file "~/emacs/.perspective")
-
-(straight-use-package 'persp-projectile)
-(require 'persp-projectile)
-(define-key projectile-mode-map (kbd "C-c C-p p") 'projectile-persp-switch-project)
 
 (straight-use-package 'solidity-mode)
 (require 'solidity-mode)

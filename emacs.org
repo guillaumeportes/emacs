@@ -1,5 +1,25 @@
 #+title Emacs Configuration
-#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
+#+PROPERTY: header-args:emacs-lisp
+
+* Straight
+
+#+begin_src emacs-lisp
+
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+  (setq package-enable-at-startup nil)
+
+#+end_src
 
 * Use Package
 
@@ -81,7 +101,7 @@
 
 #+begin_src emacs-lisp
 
-  (use-package hydra)
+  (straight-use-package 'hydra)
 
   (defvar hydra-resize-window-amount 5)
 
@@ -119,11 +139,9 @@
 
 #+begin_src emacs-lisp
 
-  (use-package slime
-    :ensure t
-    :config
-    (require 'slime-autoloads)
-    (setq inferior-lisp-program "/usr/local/bin/sbcl"))
+  (straight-use-package 'slime)
+  (require 'slime-autoloads)
+  (setq inferior-list-program "usr/local/bin/sbcl")
 
 #+end_src
 
