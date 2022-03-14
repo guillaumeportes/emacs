@@ -1,4 +1,5 @@
 ;; -*- lexical-binding: t -*-
+
 ;; straight.el stuff
 
 (defvar bootstrap-version)
@@ -15,6 +16,8 @@
   (load bootstrap-file nil 'nomessage))
 (setq package-enable-at-startup nil)
 
+;; general settings
+
 (setq history-length 25)
 (savehist-mode 1)
 (save-place-mode 1)
@@ -23,7 +26,19 @@
 (setq use-dialog-box nil)
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-buffers t)
+(savehist-mode 1)
+(setq mac-option-modifier 'meta)
+(global-set-key (kbd "C-,") (kbd "<backspace>"))
+(toggle-truncate-lines -1)
+(setq truncate-partial-width-windows nil)
+(electric-pair-mode 1)
+(show-paren-mode 1)
+(recentf-mode 1)
+(fset 'yes-or-no-p 'y-or-n-p)
 
+;; ui
+
+(toggle-frame-maximized)
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
@@ -41,12 +56,44 @@
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (set-face-attribute 'default nil :font "Fira Mono" :height 140)
-
-;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 140)
-
-;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil :font "Hack" :height 160 :weight 'regular)
+
+(straight-use-package 'all-the-icons)
+(require 'all-the-icons)
+(unless (find-font (font-spec :name "all-the-icons"))
+  (all-the-icons-install-fonts t))
+
+(straight-use-package 'doom-modeline)
+(require 'doom-modeline)
+(doom-modeline-mode 1)
+;(setq doom-modeline-height 15)
+
+(straight-use-package 'doom-themes)
+(require 'doom-themes)
+(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+      doom-themes-enable-italic t) ; if nil, italics is universally disabled
+(load-theme 'doom-one t)
+
+;; Enable flashing mode-line on errors
+(doom-themes-visual-bell-config)
+;; Enable custom neotree theme (all-the-icons must be installed!)
+(doom-themes-neotree-config)
+;; or for treemacs users
+(setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+(doom-themes-treemacs-config)
+;; Corrects (and improves) org-mode's native fontification.
+(doom-themes-org-config)
+
+(straight-use-package 'rainbow-delimiters)
+(require 'rainbow-delimiters)
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+
+(straight-use-package 'highlight-parentheses)
+(require 'highlight-parentheses)
+(add-hook 'prog-mode-hook 'highlight-parentheses-mode)
+
+;; helpful
 
 (straight-use-package 'helpful)
 (require 'helpful)
@@ -58,9 +105,8 @@
 (global-set-key (kbd "C-h F") #'helpful-function)
 (global-set-key (kbd "C-h C") #'helpful-command)
 
-(savehist-mode 1)
-
 ;; Completion
+
 (straight-use-package 'vertico)
 (vertico-mode 1)
 
@@ -96,11 +142,13 @@
 
 ;; Window management
 
+(global-set-key (kbd "C-.") 'other-window)
+(global-set-key (kbd "C->") (lambda () (interactive) (other-window -1)))
+
 (tab-bar-mode 1)
+(winner-mode 1)
 
 (straight-use-package 'hydra)
-
-(winner-mode 1)
 
 (defvar hydra-resize-window-amount 5)
 
@@ -136,27 +184,18 @@
   ("l" (winner-redo) "winner redo"))
 (define-key 'window-key-map (kbd "w") 'hydra-winner/body)
 
-(straight-use-package 'slime)
-(require 'slime-autoloads)
-(setq inferior-list-program "usr/local/bin/sbcl")
+(defhydra hydra-other-window (:timeout 4)
+  "other window"
+  ("n" (other-window 1) "next")
+  ("p" (other-window -1) "previous")
+  ("f" nil "finished" :exit t))
 
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)))
+;(define-key (current-global-map) [remap other-window] (lambda ()
+;							(interactive)
+;							(other-window 1)
+;							(hydra-other-window/body)))
 
-(require 'org-tempo)
-
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-
-;; Automatically tangle our emacs.org config file when we save it
-(defun org-babel-tangle-config()
-  (when (string-equal (buffer-file-name)
-                      (expand-file-name "~/emacs/emacs.org"))
-    ;; Dynamic scoping to the rescure
-    (let ((org-confirm-babel-evaluate nil))
-      (org-babel-tangle))))
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'org-babel-tangle-config)))
+;; dired
 
 (setq dired-listing-switches "-agho --group-directories-first")
 (setq insert-directory-program "/usr/local/bin/gls")
@@ -171,36 +210,6 @@
 (straight-use-package 'command-log-mode)
 (require 'command-log-mode)
 
-(straight-use-package 'all-the-icons)
-(require 'all-the-icons)
-(unless (find-font (font-spec :name "all-the-icons"))
-  (all-the-icons-install-fonts t))
-
-(straight-use-package 'doom-modeline)
-(require 'doom-modeline)
-(doom-modeline-mode 1)
-;(setq doom-modeline-height 15)
-
-(straight-use-package 'doom-themes)
-(require 'doom-themes)
-(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-      doom-themes-enable-italic t) ; if nil, italics is universally disabled
-(load-theme 'doom-one t)
-
-;; Enable flashing mode-line on errors
-(doom-themes-visual-bell-config)
-;; Enable custom neotree theme (all-the-icons must be installed!)
-(doom-themes-neotree-config)
-;; or for treemacs users
-(setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-(doom-themes-treemacs-config)
-;; Corrects (and improves) org-mode's native fontification.
-(doom-themes-org-config)
-
-(straight-use-package 'rainbow-delimiters)
-(require 'rainbow-delimiters)
-(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-
 (straight-use-package 'diminish)
 (require 'diminish)
 
@@ -210,25 +219,7 @@
 (diminish 'which-key-mode)
 (setq which-key-idle-delay 0.3)
 
-;(setq split-width-threshold 1)
-
-(setq mac-option-modifier 'meta)
-
-(global-set-key (kbd "C-.") 'other-window)
-(global-set-key (kbd "C->") (lambda () (interactive) (other-window -1)))
-
-(global-set-key (kbd "C-,") (kbd "<backspace>"))
-
-(defhydra hydra-other-window (:timeout 4)
-  "other window"
-  ("n" (other-window 1) "next")
-  ("p" (other-window -1) "previous")
-  ("f" nil "finished" :exit t))
-
-;(define-key (current-global-map) [remap other-window] (lambda ()
-;							(interactive)
-;							(other-window 1)
-;							(hydra-other-window/body)))
+;; vc
 
 (straight-use-package 'git-gutter)
 (require 'git-gutter)
@@ -238,74 +229,12 @@
 (require 'magit)
 (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 
-(straight-use-package 'lsp-mode)
-(require 'lsp-mode)
-(setq lsp-keymap-prefix "C-c l")
-(lsp-enable-which-key-integration t)
-(setq lsp-signature-render-documentation nil)
-(setq lsp-disabled-clients '(csharp-ls))
-
-(recentf-mode 1)
-(fset 'yes-or-no-p 'y-or-n-p)
-
-(straight-use-package 'csharp-mode)
-(require 'csharp-mode)
-(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
-(setq tab-width 4)
-(setq c-basic-offset 4)
-(setq c-syntactic-indentation t)
-
-(add-hook 'csharp-mode-hook 'lsp-deferred)
-(add-hook 'js-mode-hook 'lsp-deferred)
-
-(setq truncate-lines t)
-
-(straight-use-package 'smex)
-(require 'smex)
-(smex-initialize)
+;; shell
 
 (straight-use-package 'exec-path-from-shell)
 (require 'exec-path-from-shell)
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
-
-(straight-use-package 'company)
-(require 'company)
-(add-hook 'lsp-mode-hook 'company-mode)
-(add-hook 'prog-mode-hook 'company-mode)
-(define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
-(define-key lsp-mode-map (kbd "<tab>") 'company-indent-or-complete-common)
-(setq company-minimum-prefix-length 1)
-(setq company-idle-delay 0.0)
-(setq company-show-quick-access t)
-
-(straight-use-package 'company-box)
-(require 'company-box)
-(add-hook 'company-mode-hook 'company-box-mode)
-
-(straight-use-package 'lsp-ui)
-(require 'lsp-ui)
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
-(setq lsp-ui-doc-position 'bottom)
-(setq lsp-ui-sideline-enable nil)
-(setq lsp-ui-sideline-show-hover nil)
-
-;(straight-use-package 'lsp-ivy)
-;(require 'lsp-ivy)
-
-(straight-use-package 'evil-nerd-commenter)
-(require 'evil-nerd-commenter)
-(global-set-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
-
-(straight-use-package 'flycheck)
-(require 'flycheck)
-(global-flycheck-mode 1)
-
-(toggle-frame-maximized)
-
-(straight-use-package 'highlight-parentheses)
-(require 'highlight-parentheses)
-(add-hook 'prog-mode-hook 'highlight-parentheses-mode)
 
 (straight-use-package 'vterm)
 (require 'vterm)
@@ -323,35 +252,48 @@
         eshell-hist-ignoredups t
         eshell-scroll-to-bottom-on-input t))
 
-
-
 (add-hook 'eshell-first-time-mode-hook 'configure-eshell)
 (with-eval-after-load 'esh-opt
   (setq eshell-destroy-buffer-when-process-dies t)
   (setq eshell-visual-commands '("htop" "zsh" "vim")))
-;(eshell-git-prompt-use-theme 'powerline)
+(eshell-git-prompt-use-theme 'powerline)
 
 (straight-use-package 'eshell-git-prompt)
 (require 'eshell-git-prompt)
 
-(toggle-truncate-lines -1)
-(setq truncate-partial-width-windows nil)
+;; languages
 
-(straight-use-package 'python-mode)
-(require 'python-mode)
-(add-hook 'python-mode-hook 'lsp-deferred)
-(setq python-shell-interpreter "ipython")
-(setq python-shell-interpreter-args "--colors=Linux --profile=default --simple-prompt --pprint")
-(setq python-shell-prompt-regexp "In \\[[0-9]+\\]: ")
-(setq python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: ")
-(setq python-shell-completion-setup-code "from IPython.core.completerlib import module_completion")
-(setq python-shell-completion-module-string-code "';'.join(module_completion('''%s'''))\n")
-(setq python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
-(setq python-shell-completion-native-enable nil)
+;;; flycheck
 
-(straight-use-package 'pyvenv)
-(require 'pyvenv)
-(pyvenv-mode 1)
+(straight-use-package 'flycheck)
+(require 'flycheck)
+(global-flycheck-mode 1)
+
+;;; company
+
+(straight-use-package 'company)
+(require 'company)
+(add-hook 'prog-mode-hook 'company-mode)
+(define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
+(setq company-minimum-prefix-length 1)
+(setq company-idle-delay 0.0)
+(setq company-show-quick-access t)
+
+(straight-use-package 'company-box)
+(require 'company-box)
+(add-hook 'company-mode-hook 'company-box-mode)
+
+(straight-use-package 'evil-nerd-commenter)
+(require 'evil-nerd-commenter)
+(global-set-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
+
+;;; common lisp
+
+(straight-use-package 'slime)
+(require 'slime-autoloads)
+(setq inferior-list-program "usr/local/bin/sbcl")
+
+;;; solidity
 
 (straight-use-package 'solidity-mode)
 (require 'solidity-mode)
@@ -366,6 +308,17 @@
 
 (straight-use-package 'company-solidity)
 (require 'company-solidity)
+
+;; org
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)))
+
+(require 'org-tempo)
+
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 
 (defun org-mode-setup ()
   (org-indent-mode)
