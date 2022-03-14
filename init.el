@@ -112,7 +112,9 @@
 
 (straight-use-package 'orderless)
 (require 'orderless)
-(setq completion-styles '(orderless))
+(setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion))))
 
 (straight-use-package 'marginalia)
 (require 'marginalia)
@@ -255,8 +257,8 @@
 (add-hook 'eshell-first-time-mode-hook 'configure-eshell)
 (with-eval-after-load 'esh-opt
   (setq eshell-destroy-buffer-when-process-dies t)
-  (setq eshell-visual-commands '("htop" "zsh" "vim")))
-(eshell-git-prompt-use-theme 'powerline)
+  (setq eshell-visual-commands '("htop" "zsh" "vim"))
+  (eshell-git-prompt-use-theme 'powerline))
 
 (straight-use-package 'eshell-git-prompt)
 (require 'eshell-git-prompt)
@@ -268,6 +270,10 @@
 (straight-use-package 'flycheck)
 (require 'flycheck)
 (global-flycheck-mode 1)
+
+;;; eglot
+
+(straight-use-package 'eglot)
 
 ;;; company
 
@@ -291,7 +297,14 @@
 
 (straight-use-package 'slime)
 (require 'slime-autoloads)
-(setq inferior-list-program "usr/local/bin/sbcl")
+(setq inferior-lisp-program "/usr/local/bin/sbcl")
+
+;;; csharp
+(straight-use-package 'tree-sitter)
+(straight-use-package 'tree-sitter-langs)
+(straight-use-package 'tree-sitter-indent)
+(straight-use-package 'csharp-mode)
+(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-tree-sitter-mode))
 
 ;;; solidity
 
