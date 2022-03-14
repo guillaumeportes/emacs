@@ -61,7 +61,12 @@
 (savehist-mode 1)
 
 ;; Completion
+(straight-use-package 'vertico)
+(vertico-mode 1)
 
+(straight-use-package 'orderless)
+(require 'orderless)
+(setq completion-styles '(orderless))
 
 ;; (straight-use-package 'ivy)
 ;; (require 'ivy)
@@ -192,7 +197,7 @@
 (setq dired-listing-switches "-agho --group-directories-first")
 (setq insert-directory-program "/usr/local/bin/gls")
 (setq delete-by-moving-to-trash t)
-(bind-key (kbd "C-x C-g") 'dired-jump)
+(global-set-key (kbd "C-x C-g") 'dired-jump)
 
 (straight-use-package 'dired-single)
 (straight-use-package 'all-the-icons-dired)
@@ -304,8 +309,8 @@
 (require 'company)
 (add-hook 'lsp-mode-hook 'company-mode)
 (add-hook 'prog-mode-hook 'company-mode)
-(bind-key (kbd "<tab>") 'company-complete-selection 'company-mode-map)
-(bind-key (kbd "<tab>") 'company-indent-or-complete-common 'lsp-mode-map)
+(define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
+(define-key lsp-mode-map (kbd "<tab>") 'company-indent-or-complete-common)
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0.0)
 (setq company-show-quick-access t)
@@ -326,7 +331,7 @@
 
 (straight-use-package 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
-(bind-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
+(global-set-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
 
 (straight-use-package 'flycheck)
 (require 'flycheck)
@@ -360,7 +365,7 @@
 (with-eval-after-load 'esh-opt
   (setq eshell-destroy-buffer-when-process-dies t)
   (setq eshell-visual-commands '("htop" "zsh" "vim")))
-(eshell-git-prompt-use-theme 'powerline)
+;(eshell-git-prompt-use-theme 'powerline)
 
 (straight-use-package 'eshell-git-prompt)
 (require 'eshell-git-prompt)
@@ -425,7 +430,7 @@
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
 (add-hook 'org-mode-hook 'org-mode-setup)
-(unbind-key "C-," org-mode-map)
+(define-key org-mode-map "C-," nil)
 (setq org-ellipsis " ▾"
       org-hide-emphasis-markers nil)
 (setq org-agenda-start-with-log-mode t)
