@@ -35,8 +35,15 @@
 (show-paren-mode 1)
 (recentf-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
+(setq-default indent-tabs-mode nil)
 
 ;; ui
+
+(setq auto-window-vscroll nil)
+(customize-set-variable 'fast-but-imprecise-scrolling t)
+(customize-set-variable 'scroll-conservatively 101)
+(customize-set-variable 'scroll-margin 0)
+(customize-set-variable 'scroll-preserve-screen-position t)
 
 (toggle-frame-maximized)
 (setq inhibit-startup-message t)
@@ -136,6 +143,7 @@
 (straight-use-package 'embark)
 (require 'embark)
 (global-set-key (kbd "C-:") 'embark-act)
+(global-set-key (kbd "C-;") 'embark-export)
 (global-set-key (kbd "C-h B") 'embark-bindings)
 
 (straight-use-package 'embark-consult)
@@ -148,6 +156,9 @@
 (global-set-key (kbd "C->") (lambda () (interactive) (other-window -1)))
 
 (tab-bar-mode 1)
+(setq tab-bar-close-button-show nil
+      tab-bar-new-button-show nil)
+
 (winner-mode 1)
 
 (straight-use-package 'hydra)
@@ -296,8 +307,10 @@
 ;;; common lisp
 
 (straight-use-package 'slime)
+(straight-use-package 'slime-company)
 (require 'slime-autoloads)
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
+(slime-setup '(slime-fancy slime-company))
 
 ;;; csharp
 (straight-use-package 'tree-sitter)
