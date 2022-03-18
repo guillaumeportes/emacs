@@ -71,6 +71,9 @@
 (unless (find-font (font-spec :name "all-the-icons"))
   (all-the-icons-install-fonts t))
 
+(straight-use-package 'all-the-icons-completion)
+(all-the-icons-completion-mode 1)
+
 (straight-use-package 'doom-modeline)
 (require 'doom-modeline)
 (doom-modeline-mode 1)
@@ -115,13 +118,19 @@
 ;; Completion
 
 (straight-use-package 'vertico)
+(require 'vertico)
 (vertico-mode 1)
+(require 'vertico-directory "extensions/vertico-directory.el")
+(define-key vertico-map (kbd "RET") 'vertico-directory-enter)
+(define-key vertico-map (kbd "DEL") 'vertico-directory-delete-char)
+(define-key vertico-map (kbd "M-DEL") 'vertico-directory-delete-word)
+(add-hook 'rfn-eshadow-update-overlay-hook 'vertico-directory-tidy)
 
 (straight-use-package 'orderless)
 (require 'orderless)
-(setq completion-styles '(orderless)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion))))
+(setq completion-styles '(basic partial-completion orderless)
+      completion-category-defaults nil
+      completion-category-overrides '((file (styles partial-completion))))
 
 (straight-use-package 'marginalia)
 (require 'marginalia)
@@ -150,6 +159,14 @@
 (require 'embark-consult)
 (add-hook 'embark-collect-mode-hook 'consult-preview-at-point-mode)
 
+;; Navigation
+
+(straight-use-package 'avy)
+(require 'avy)
+
+;; (straight-use-package 'evil)
+;; (require 'evil)
+
 ;; Window management
 
 (global-set-key (kbd "C-.") 'other-window)
@@ -158,6 +175,9 @@
 (tab-bar-mode 1)
 (setq tab-bar-close-button-show nil
       tab-bar-new-button-show nil)
+
+;(setq split-height-threshold nil)
+;(setq split-width-threshold 0)
 
 (winner-mode 1)
 
@@ -193,7 +213,7 @@
 
 (defhydra hydra-winner ()
   "winner undo / redo"
-  ("j" (winner-undo) "winner undo")
+  ("j" (progn (winner-undo) (setq this-command 'winner-undo)) "winner undo")
   ("l" (winner-redo) "winner redo"))
 (define-key 'window-key-map (kbd "w") 'hydra-winner/body)
 
@@ -209,6 +229,18 @@
 ;							(hydra-other-window/body)))
 
 ;; dired
+
+; n - next line
+; p - previous line
+; RET / C-m - open file
+; ^ - parent directory
+; v - preview mode (q to close)
+; o - open in other window
+; C-o - open in other window without focussing
+; dired-jump - open dired in the directory of the current buffer file
+; j - dired-goto-file
+; f - dired-find-file
+; ( - dired-hide-details
 
 (setq dired-listing-switches "-agho --group-directories-first")
 (setq insert-directory-program "/usr/local/bin/gls")
@@ -282,15 +314,39 @@
 (require 'flycheck)
 (global-flycheck-mode 1)
 
-;;; eglot
+;;; lsp
 
-(straight-use-package 'eglot)
+(straight-use-package 'lsp-mode)
+(require 'lsp-mode)
+(add-hook 'csharp-mode-hook 'lsp-deferred)
+
+;;; corfu
+
+;; (straight-use-package 'corfu)
+;; (require 'corfu)
+;; (setq corfu-auto 1)
+;; (corfu-global-mode 1)
+;; (global-set-key (kbd "M-/") 'dabbrev-completion)
+;; (add-hook 'csharp-mode-hook 'corfu-mode)
+
+;; (straight-use-package 'kind-icon)
+;; (require 'kind-icon)
+;; (setq kind-icon-default-face 'corfu-default)
+;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+
+;; (straight-use-package '(corfu-doc :type git :host github :repo "galeo/corfu-doc"))
+;; (require 'corfu-doc)
+;; (add-hook 'corfu-mode-hook #'corfu-doc-mode)
+;; (define-key corfu-map (kbd "M-n") #'corfu-doc-scroll-up)
+;; (define-key corfu-map (kbd "M-p") #'corfu-doc-scroll-down)
+
+;; (setq tab-always-indent 'complete)
 
 ;;; company
 
 (straight-use-package 'company)
 (require 'company)
-(add-hook 'prog-mode-hook 'company-mode)
+(global-company-mode)
 (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0.0)
@@ -300,24 +356,34 @@
 (require 'company-box)
 (add-hook 'company-mode-hook 'company-box-mode)
 
+(straight-use-package 'company-lsp)
+(require 'company-lsp)
+
 (straight-use-package 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
-(global-set-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
+(global-set-key (kbd "C-c C-c") 'evilnc-comment-or-uncomment-lines)
 
 ;;; common lisp
 
 (straight-use-package 'slime)
 (straight-use-package 'slime-company)
 (require 'slime-autoloads)
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 (slime-setup '(slime-fancy slime-company))
 
+(straight-use-package 'lispy)
+(require 'lispy)
+(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+(add-hook 'lisp-mode-hook (lambda () (lispy-mode 1)))
+
+;; (straight-use-package 'sly)
+;; (require 'sly)
+
 ;;; csharp
-(straight-use-package 'tree-sitter)
-(straight-use-package 'tree-sitter-langs)
-(straight-use-package 'tree-sitter-indent)
 (straight-use-package 'csharp-mode)
-(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-tree-sitter-mode))
+(require 'csharp-mode)
+(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
 
 ;;; solidity
 
