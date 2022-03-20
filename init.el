@@ -28,7 +28,6 @@
 (setq global-auto-revert-non-file-buffers t)
 (savehist-mode 1)
 (setq mac-option-modifier 'meta)
-(global-set-key (kbd "C-,") (kbd "<backspace>"))
 (toggle-truncate-lines -1)
 (setq truncate-partial-width-windows nil)
 (electric-pair-mode 1)
@@ -36,6 +35,14 @@
 (recentf-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq-default indent-tabs-mode nil)
+
+;; keys
+
+(global-set-key (kbd "C-,") (kbd "<backspace>"))
+(global-set-key (kbd "C-<") 'backward-kill-word)
+(global-set-key (kbd "C-S-d") 'kill-word)
+(global-set-key (kbd "C-S-b") 'backward-word)
+(global-set-key (kbd "C-S-f") 'forward-word)
 
 ;; ui
 
@@ -84,6 +91,24 @@
 (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
       doom-themes-enable-italic t) ; if nil, italics is universally disabled
 (load-theme 'doom-one t)
+
+(straight-use-package 'beacon)
+(require 'beacon)
+(beacon-mode 1)
+
+(straight-use-package 'dimmer)
+(require 'dimmer)
+(dimmer-configure-which-key)
+(dimmer-configure-company-box)
+(dimmer-configure-hydra)
+(dimmer-configure-magit)
+(dimmer-mode 1)
+
+(straight-use-package 'avy)
+(setq avy-keys (number-sequence ?a ?z))
+(require 'avy)
+(global-set-key (kbd "C-'") 'avy-goto-word-1-below)
+(global-set-key (kbd "C-\"") 'avy-goto-word-1-above)
 
 ;; Enable flashing mode-line on errors
 (doom-themes-visual-bell-config)
@@ -158,14 +183,6 @@
 (straight-use-package 'embark-consult)
 (require 'embark-consult)
 (add-hook 'embark-collect-mode-hook 'consult-preview-at-point-mode)
-
-;; Navigation
-
-(straight-use-package 'avy)
-(require 'avy)
-
-;; (straight-use-package 'evil)
-;; (require 'evil)
 
 ;; Window management
 
@@ -376,6 +393,21 @@
 (require 'lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 (add-hook 'lisp-mode-hook (lambda () (lispy-mode 1)))
+(define-key lispy-map-keymap (kbd "C-,") nil)
+(define-key lispy-mode-map (kbd "C-,") nil)
+(define-key lispy-mode-map-lispy (kbd "C-,") nil)
+(define-key lispy-mode-map (kbd "<DEL>") nil)
+(define-key lispy-mode-map-lispy (kbd "<DEL>") nil)
+(define-key lispy-mode-map (kbd ")") nil)
+(define-key lispy-mode-map-lispy (kbd ")") nil)
+(define-key lispy-mode-map (kbd "(") nil)
+(define-key lispy-mode-map-lispy (kbd "(") nil)
+(define-key lispy-mode-map (kbd "M-w") nil)
+(define-key lispy-mode-map-lispy (kbd "M-w") nil)
+(define-key lispy-mode-map (kbd "C-y") nil)
+(define-key lispy-mode-map-lispy (kbd "C-y") nil)
+(define-key lispy-mode-map (kbd "C-d") nil)
+(define-key lispy-mode-map-lispy (kbd "C-d") nil)
 
 ;; (straight-use-package 'sly)
 ;; (require 'sly)
