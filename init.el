@@ -43,6 +43,8 @@
 (global-set-key (kbd "C-S-d") 'kill-word)
 (global-set-key (kbd "C-S-b") 'backward-word)
 (global-set-key (kbd "C-S-f") 'forward-word)
+(global-set-key (kbd "C-<tab>") 'tab-next)
+(global-set-key (kbd "C-S-<tab>") 'tab-previous)
 
 ;; ui
 
@@ -92,17 +94,9 @@
       doom-themes-enable-italic t) ; if nil, italics is universally disabled
 (load-theme 'doom-one t)
 
-(straight-use-package 'beacon)
-(require 'beacon)
-(beacon-mode 1)
-
-(straight-use-package 'dimmer)
-(require 'dimmer)
-(dimmer-configure-which-key)
-(dimmer-configure-company-box)
-(dimmer-configure-hydra)
-(dimmer-configure-magit)
-(dimmer-mode 1)
+;; (straight-use-package 'modus-themes)
+;; (require 'modus-themes)
+;; (modus-themes-load-operandi)
 
 (straight-use-package 'avy)
 (setq avy-keys (number-sequence ?a ?z))
@@ -335,6 +329,7 @@
 
 (straight-use-package 'lsp-mode)
 (require 'lsp-mode)
+(setq lsp-lens-enable nil)
 (add-hook 'csharp-mode-hook 'lsp-deferred)
 
 ;;; corfu
@@ -400,6 +395,8 @@
 (define-key lispy-mode-map-lispy (kbd "<DEL>") nil)
 (define-key lispy-mode-map (kbd ")") nil)
 (define-key lispy-mode-map-lispy (kbd ")") nil)
+(define-key lispy-mode-map (kbd "\"") nil)
+(define-key lispy-mode-map-lispy (kbd "\"") nil)
 (define-key lispy-mode-map (kbd "(") nil)
 (define-key lispy-mode-map-lispy (kbd "(") nil)
 (define-key lispy-mode-map (kbd "M-w") nil)
@@ -408,6 +405,8 @@
 (define-key lispy-mode-map-lispy (kbd "C-y") nil)
 (define-key lispy-mode-map (kbd "C-d") nil)
 (define-key lispy-mode-map-lispy (kbd "C-d") nil)
+(define-key lispy-mode-map (kbd "C-k") nil)
+(define-key lispy-mode-map-lispy (kbd "C-k") nil)
 
 ;; (straight-use-package 'sly)
 ;; (require 'sly)
