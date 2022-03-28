@@ -159,24 +159,44 @@
 (straight-use-package 'consult)
 (require 'consult)
 (global-set-key (kbd "C-x b") 'consult-buffer)
-(global-set-key (kbd "C-y") 'consult-yank-from-kill-ring)
-(global-set-key (kbd "M-y") 'consult-yank-pop)
-(global-set-key (kbd "M-g g") 'consult-goto-line)
-(global-set-key (kbd "M-g M-g") 'consult-goto-line)
 (global-set-key (kbd "M-g m") 'consult-mark)
 (global-set-key (kbd "M-g i") 'consult-imenu)
-(global-set-key (kbd "C-s") 'consult-line)
-(global-set-key (kbd "C-S-s") 'consult-line-multi)
 
-(straight-use-package 'embark)
-(require 'embark)
-(global-set-key (kbd "C-:") 'embark-act)
-(global-set-key (kbd "C-;") 'embark-export)
-(global-set-key (kbd "C-h B") 'embark-bindings)
+(straight-use-package 'pulsar)
+(require 'pulsar)
+(setq pulsar-pulse-functions
+      '(isearch-repeat-forward
+        isearch-repeat-backward
+        recenter-top-bottom
+        move-to-window-line-top-bottom
+        reposition-window
+        bookmark-jump
+        other-window
+        delete-window
+        delete-other-windows
+        forward-page
+        backward-page
+        scroll-up-command
+        scroll-down-command
+        windmove-right
+        windmove-left
+        windmove-up
+        windmove-down
+        windmove-swap-states-right
+        windmove-swap-states-left
+        windmove-swap-states-up
+        windmove-swap-states-down
+        tab-new
+        tab-close
+        tab-next))
 
-(straight-use-package 'embark-consult)
-(require 'embark-consult)
-(add-hook 'embark-collect-mode-hook 'consult-preview-at-point-mode)
+(setq pulsar-pulse t)
+(setq pulsar-delay 0.055)
+(setq pulsar-iterations 10)
+(setq pulsar-face 'pulsar-magenta)
+(setq pulsar-highlight-face 'pulsar-yellow)
+
+(pulsar-global-mode 1)
 
 ;; Window management
 
@@ -282,6 +302,7 @@
 (git-gutter-mode +1)
 
 (straight-use-package 'magit)
+(define-key magit-section-mode-map (kbd "C-<tab>") nil)
 (require 'magit)
 (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 
@@ -318,12 +339,6 @@
 (require 'eshell-git-prompt)
 
 ;; languages
-
-;;; flycheck
-
-(straight-use-package 'flycheck)
-(require 'flycheck)
-(global-flycheck-mode 1)
 
 ;;; lsp
 
@@ -384,32 +399,10 @@
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 (slime-setup '(slime-fancy slime-company))
 
-(straight-use-package 'lispy)
-(require 'lispy)
-(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
-(add-hook 'lisp-mode-hook (lambda () (lispy-mode 1)))
-(define-key lispy-map-keymap (kbd "C-,") nil)
-(define-key lispy-mode-map (kbd "C-,") nil)
-(define-key lispy-mode-map-lispy (kbd "C-,") nil)
-(define-key lispy-mode-map (kbd "<DEL>") nil)
-(define-key lispy-mode-map-lispy (kbd "<DEL>") nil)
-(define-key lispy-mode-map (kbd ")") nil)
-(define-key lispy-mode-map-lispy (kbd ")") nil)
-(define-key lispy-mode-map (kbd "\"") nil)
-(define-key lispy-mode-map-lispy (kbd "\"") nil)
-(define-key lispy-mode-map (kbd "(") nil)
-(define-key lispy-mode-map-lispy (kbd "(") nil)
-(define-key lispy-mode-map (kbd "M-w") nil)
-(define-key lispy-mode-map-lispy (kbd "M-w") nil)
-(define-key lispy-mode-map (kbd "C-y") nil)
-(define-key lispy-mode-map-lispy (kbd "C-y") nil)
-(define-key lispy-mode-map (kbd "C-d") nil)
-(define-key lispy-mode-map-lispy (kbd "C-d") nil)
-(define-key lispy-mode-map (kbd "C-k") nil)
-(define-key lispy-mode-map-lispy (kbd "C-k") nil)
-
-;; (straight-use-package 'sly)
-;; (require 'sly)
+(global-set-key (kbd "C-M-S-j") 'backward-sexp)
+(global-set-key (kbd "C-M-:") 'forward-sexp)
+(global-set-key (kbd "C-M-S-k") #'(lambda () (interactive) (re-search-backward "[()]")))
+(global-set-key (kbd "C-M-S-l") #'(lambda () (interactive) (re-search-forward "[()]")))
 
 ;;; csharp
 (straight-use-package 'csharp-mode)
@@ -422,12 +415,6 @@
 (require 'solidity-mode)
 (setq solidity-comment-style 'slash)
 (define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point)
-
-(straight-use-package 'solidity-flycheck)
-(require 'solidity-flycheck)
-(setq solidity-flycheck-solc-checker-active t)
-(setq solidity-flycheck-solium-checker-active t)
-(setq flycheck-solidity-solc-addstd-contracts t)
 
 (straight-use-package 'company-solidity)
 (require 'company-solidity)
