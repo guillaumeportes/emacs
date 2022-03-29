@@ -45,6 +45,9 @@
 (global-set-key (kbd "C-S-f") 'forward-word)
 (global-set-key (kbd "C-<tab>") 'tab-next)
 (global-set-key (kbd "C-S-<tab>") 'tab-previous)
+(define-key isearch-mode-map (kbd "C-,") 'isearch-delete-char)
+(define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
+
 
 ;; ui
 
@@ -159,8 +162,14 @@
 (straight-use-package 'consult)
 (require 'consult)
 (global-set-key (kbd "C-x b") 'consult-buffer)
+(global-set-key (kbd "C-x p b") 'consult-project-buffer)
 (global-set-key (kbd "M-g m") 'consult-mark)
 (global-set-key (kbd "M-g i") 'consult-imenu)
+
+(consult-customize
+ consult--source-buffer
+ consult--source-bookmark consult--source-recent-file
+ consult--source-project-recent-file :preview-key (kbd "M-."))
 
 (straight-use-package 'pulsar)
 (require 'pulsar)
@@ -302,8 +311,8 @@
 (git-gutter-mode +1)
 
 (straight-use-package 'magit)
-(define-key magit-section-mode-map (kbd "C-<tab>") nil)
 (require 'magit)
+(define-key magit-section-mode-map (kbd "C-<tab>") nil)
 (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 
 ;; shell
@@ -340,6 +349,10 @@
 
 ;; languages
 
+(straight-use-package 'flycheck)
+(require 'flycheck)
+(global-flycheck-mode 1)
+
 ;;; lsp
 
 (straight-use-package 'lsp-mode)
@@ -349,9 +362,11 @@
 
 ;;; corfu
 
-;; (straight-use-package 'corfu)
-;; (require 'corfu)
-;; (setq corfu-auto 1)
+(straight-use-package 'corfu)
+(require 'corfu)
+(setq corfu-auto 1)
+(add-hook 'shell-mode-hook 'corfu-mode)
+(add-hook 'eshell-mode-hook 'corfu-mode)
 ;; (corfu-global-mode 1)
 ;; (global-set-key (kbd "M-/") 'dabbrev-completion)
 ;; (add-hook 'csharp-mode-hook 'corfu-mode)
@@ -373,6 +388,7 @@
 
 (straight-use-package 'company)
 (require 'company)
+(setq company-global-modes '(not shell-mode eshell-mode))
 (global-company-mode)
 (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
 (setq company-minimum-prefix-length 1)
