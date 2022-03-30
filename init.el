@@ -308,7 +308,7 @@
 
 (straight-use-package 'git-gutter)
 (require 'git-gutter)
-(git-gutter-mode +1)
+(global-git-gutter-mode 1)
 
 (straight-use-package 'magit)
 (require 'magit)
@@ -407,13 +407,19 @@
 (global-set-key (kbd "C-c C-c") 'evilnc-comment-or-uncomment-lines)
 
 ;;; common lisp
+(setq inferior-lisp-program "/usr/local/bin/sbcl")
 
 (straight-use-package 'slime)
 (straight-use-package 'slime-company)
 (require 'slime-autoloads)
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
-(setq inferior-lisp-program "/usr/local/bin/sbcl")
-(slime-setup '(slime-fancy slime-company))
+(slime-setup '(slime-fancy slime-company slime-fuzzy))
+(setq slime-complete-symbol-function #'slime-fuzzy-complete-symbol)
+(setq slime-company-completion 'fuzzy)
+(global-set-key (kbd "C-c s") #'slime-selector)
+
+;; (straight-use-package 'sly)
+;; (require 'sly)
 
 (global-set-key (kbd "C-M-S-j") 'backward-sexp)
 (global-set-key (kbd "C-M-:") 'forward-sexp)
