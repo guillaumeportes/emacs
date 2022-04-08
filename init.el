@@ -362,11 +362,11 @@
 
 ;;; corfu
 
-(straight-use-package 'corfu)
-(require 'corfu)
-(setq corfu-auto 1)
-(add-hook 'shell-mode-hook 'corfu-mode)
-(add-hook 'eshell-mode-hook 'corfu-mode)
+;; (straight-use-package 'corfu)
+;; (require 'corfu)
+;; (setq corfu-auto 1)
+;; (add-hook 'shell-mode-hook 'corfu-mode)
+;; (add-hook 'eshell-mode-hook 'corfu-mode)
 ;; (corfu-global-mode 1)
 ;; (global-set-key (kbd "M-/") 'dabbrev-completion)
 ;; (add-hook 'csharp-mode-hook 'corfu-mode)
@@ -413,9 +413,9 @@
 (straight-use-package 'slime-company)
 (require 'slime-autoloads)
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
-(slime-setup '(slime-fancy slime-company slime-fuzzy))
-(setq slime-complete-symbol-function #'slime-fuzzy-complete-symbol)
-(setq slime-company-completion 'fuzzy)
+(slime-setup '(slime-fancy slime-company slime-c-p-c))
+(setq slime-complete-symbol-function #'slime-c-p-c-completion-at-point)
+(setq slime-company-completion 'simple)
 (global-set-key (kbd "C-c s") #'slime-selector)
 
 ;; (straight-use-package 'sly)
@@ -440,3 +440,13 @@
 
 (straight-use-package 'company-solidity)
 (require 'company-solidity)
+
+;;; eww
+
+(setq
+ browse-url-browser-function 'eww-browse-url ; Use eww as the default browser
+ shr-use-fonts  nil                          ; No special fonts
+ shr-use-colors nil                          ; No colours
+ shr-indentation 2                           ; Left-side margin
+ shr-width 70                                ; Fold text to 70 columns
+ eww-search-prefix "https://wiby.me/?q=")    ; Use another engine for searching
