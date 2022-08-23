@@ -26,7 +26,6 @@
 (setq use-dialog-box nil)
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-buffers t)
-(savehist-mode 1)
 (setq mac-option-modifier 'meta)
 (toggle-truncate-lines -1)
 (setq truncate-partial-width-windows nil)
@@ -146,11 +145,17 @@
 (define-key vertico-map (kbd "RET") 'vertico-directory-enter)
 (define-key vertico-map (kbd "DEL") 'vertico-directory-delete-char)
 (define-key vertico-map (kbd "M-DEL") 'vertico-directory-delete-word)
-(add-hook 'rfn-eshadow-update-overlay-hook 'vertico-directory-tidy)
+(add-hook 'vertico-mode-hook #'rfn-eshadow-update-overlay)
+(add-hook 'vertico-mode-hook #'vertico-directory-tidy)
+
+(setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+(setq read-extended-command-predicate #'command-completion-default-include-p)
+(setq enable-recursive-minibuffers t)
 
 (straight-use-package 'orderless)
 (require 'orderless)
-(setq completion-styles '(basic partial-completion orderless)
+(setq completion-styles '(orderless basic)
       completion-category-defaults nil
       completion-category-overrides '((file (styles partial-completion))))
 
@@ -354,11 +359,15 @@
 (global-flycheck-mode 1)
 
 ;;; lsp
-
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
 (straight-use-package 'lsp-mode)
 (require 'lsp-mode)
 (setq lsp-lens-enable nil)
-(add-hook 'csharp-mode-hook 'lsp-deferred)
+(add-hook 'csharp-mode-hook #'lsp-deferred)
+(straight-use-package 'lsp-ui)
+(require 'lsp-ui)
+;; (setq lsp-csharp-solution-file "~/dev/chess/chess.sln")
 
 ;;; corfu
 
@@ -388,12 +397,13 @@
 
 (straight-use-package 'company)
 (require 'company)
-(setq company-global-modes '(not shell-mode eshell-mode))
+(setq company-global-modes '(not vterm-mode))
 (global-company-mode)
 (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0.0)
 (setq company-show-quick-access t)
+(setq company-backends '(company-capf))
 
 (straight-use-package 'company-box)
 (require 'company-box)
@@ -413,10 +423,16 @@
 (straight-use-package 'slime-company)
 (require 'slime-autoloads)
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
-(slime-setup '(slime-fancy slime-company slime-c-p-c))
+(slime-setup '(slime-fancy slime-company slime-c-p-c slime-tramp))
 (setq slime-complete-symbol-function #'slime-c-p-c-completion-at-point)
 (setq slime-company-completion 'simple)
 (global-set-key (kbd "C-c s") #'slime-selector)
+
+(add-to-list 'slime-filename-translations
+             (slime-create-filename-translator
+              :machine-instance "ip-172-31-38-8.eu-west-1.compute.internal"
+              :remote-host "127.0.0.1"
+              :username "root"))
 
 ;; (straight-use-package 'sly)
 ;; (require 'sly)
@@ -450,3 +466,11 @@
  shr-indentation 2                           ; Left-side margin
  shr-width 70                                ; Fold text to 70 columns
  eww-search-prefix "https://wiby.me/?q=")    ; Use another engine for searching
+
+(straight-use-package 'docker)
+(require 'docker)
+(straight-use-package 'docker-compose-mode)
+(require 'docker-compose-mode)
+(straight-use-package 'dockerfile-mode)
+(require 'dockerfile-mode)
+
