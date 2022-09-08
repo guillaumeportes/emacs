@@ -96,10 +96,6 @@
       doom-themes-enable-italic t) ; if nil, italics is universally disabled
 (load-theme 'doom-one t)
 
-;; (straight-use-package 'modus-themes)
-;; (require 'modus-themes)
-;; (modus-themes-load-operandi)
-
 (straight-use-package 'avy)
 (setq avy-keys (number-sequence ?a ?z))
 (require 'avy)
@@ -367,31 +363,23 @@
 (add-hook 'csharp-mode-hook #'lsp-deferred)
 (straight-use-package 'lsp-ui)
 (require 'lsp-ui)
-;; (setq lsp-csharp-solution-file "~/dev/chess/chess.sln")
 
 ;;; corfu
 
 ;; (straight-use-package 'corfu)
 ;; (require 'corfu)
-;; (setq corfu-auto 1)
-;; (add-hook 'shell-mode-hook 'corfu-mode)
-;; (add-hook 'eshell-mode-hook 'corfu-mode)
-;; (corfu-global-mode 1)
-;; (global-set-key (kbd "M-/") 'dabbrev-completion)
-;; (add-hook 'csharp-mode-hook 'corfu-mode)
+;; (global-corfu-mode)
+;; (setq corfu-auto t)
+;; (define-key corfu-map (kbd "C-m") nil)
 
 ;; (straight-use-package 'kind-icon)
 ;; (require 'kind-icon)
 ;; (setq kind-icon-default-face 'corfu-default)
 ;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
-;; (straight-use-package '(corfu-doc :type git :host github :repo "galeo/corfu-doc"))
+;; (straight-use-package 'corfu-doc)
 ;; (require 'corfu-doc)
 ;; (add-hook 'corfu-mode-hook #'corfu-doc-mode)
-;; (define-key corfu-map (kbd "M-n") #'corfu-doc-scroll-up)
-;; (define-key corfu-map (kbd "M-p") #'corfu-doc-scroll-down)
-
-;; (setq tab-always-indent 'complete)
 
 ;;; company
 
@@ -400,10 +388,13 @@
 (setq company-global-modes '(not vterm-mode))
 (global-company-mode)
 (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
+(define-key company-active-map (kbd "C-m") nil)
+(define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
+
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0.0)
 (setq company-show-quick-access t)
-(setq company-backends '(company-capf))
+(setq company-backends '(company-elisp company-capf))
 
 (straight-use-package 'company-box)
 (require 'company-box)
@@ -419,23 +410,19 @@
 ;;; common lisp
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 
+;;; slime
 (straight-use-package 'slime)
 (straight-use-package 'slime-company)
+(setq slime-company-completion 'fuzzy
+      slime-company-after-completion 'slime-company-just-one-space)
 (require 'slime-autoloads)
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
-(slime-setup '(slime-fancy slime-company slime-c-p-c slime-tramp))
-(setq slime-complete-symbol-function #'slime-c-p-c-completion-at-point)
-(setq slime-company-completion 'simple)
+;(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(setq common-lisp-style-default "sbcl")
+(slime-setup '(slime-fancy slime-company))
+
+
+
 (global-set-key (kbd "C-c s") #'slime-selector)
-
-(add-to-list 'slime-filename-translations
-             (slime-create-filename-translator
-              :machine-instance "ip-172-31-38-8.eu-west-1.compute.internal"
-              :remote-host "127.0.0.1"
-              :username "root"))
-
-;; (straight-use-package 'sly)
-;; (require 'sly)
 
 (global-set-key (kbd "C-M-S-j") 'backward-sexp)
 (global-set-key (kbd "C-M-:") 'forward-sexp)
