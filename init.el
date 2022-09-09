@@ -85,32 +85,35 @@
 (straight-use-package 'all-the-icons-completion)
 (all-the-icons-completion-mode 1)
 
-(straight-use-package 'doom-modeline)
-(require 'doom-modeline)
-(doom-modeline-mode 1)
-;(setq doom-modeline-height 15)
+;; (straight-use-package 'doom-modeline)
+;; (require 'doom-modeline)
+;; (doom-modeline-mode 1)
+;; (setq doom-modeline-height 15)
+;; (straight-use-package 'doom-themes)
+;; (require 'doom-themes)
+;; (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;;       doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;; (load-theme 'doom-one t)
+;; Enable flashing mode-line on errors
+;; (doom-themes-visual-bell-config)
+;; Enable custom neotree theme (all-the-icons must be installed!)
+;; (doom-themes-neotree-config)
+;; or for treemacs users
+;; (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+;; (doom-themes-treemacs-config)
+;; Corrects (and improves) org-mode's native fontification.
+;; (doom-themes-org-config)
 
-(straight-use-package 'doom-themes)
-(require 'doom-themes)
-(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-      doom-themes-enable-italic t) ; if nil, italics is universally disabled
-(load-theme 'doom-one t)
+(straight-use-package 'ef-themes)
+(require 'ef-themes)
+(mapc #'disable-theme custom-enabled-themes)
+(load-theme 'ef-light :no-confirm)
 
 (straight-use-package 'avy)
 (setq avy-keys (number-sequence ?a ?z))
 (require 'avy)
 (global-set-key (kbd "C-'") 'avy-goto-word-1-below)
 (global-set-key (kbd "C-\"") 'avy-goto-word-1-above)
-
-;; Enable flashing mode-line on errors
-(doom-themes-visual-bell-config)
-;; Enable custom neotree theme (all-the-icons must be installed!)
-(doom-themes-neotree-config)
-;; or for treemacs users
-(setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-(doom-themes-treemacs-config)
-;; Corrects (and improves) org-mode's native fontification.
-(doom-themes-org-config)
 
 (straight-use-package 'rainbow-delimiters)
 (require 'rainbow-delimiters)
@@ -350,28 +353,40 @@
 
 ;; languages
 
-(straight-use-package 'flycheck)
-(require 'flycheck)
-(global-flycheck-mode 1)
+;; (straight-use-package 'flycheck)
+;; (require 'flycheck)
+;; (global-flycheck-mode 1)
 
-;;; lsp
+(straight-use-package 'flymake)
+(require 'flymake)
+(define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
+(define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
+(add-hook 'emacs-lisp-mode-hook 'flymake-mode)
 
-;; (setq gc-cons-threshold 100000000)
-;; (setq read-process-output-max (* 1024 1024)) ;; 1mb
-;; (straight-use-package 'lsp-mode)
-;; (require 'lsp-mode)
-;; (setq lsp-lens-enable nil)
-;; (add-hook 'csharp-mode-hook #'lsp-deferred)
-;; (straight-use-package 'lsp-ui)
-;; (require 'lsp-ui)
+(straight-use-package 'solidity-mode)
+(require 'solidity-mode)
+(setq solidity-comment-style 'slash)
+(define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point)
+
+;; (straight-use-package 'company-solidity)
+;; (require 'company-solidity)
 
 ;;; eglot
 
+(straight-use-package 'project)
+(straight-use-package 'xref)
+(straight-use-package 'eldoc)
+(straight-use-package 'jsonrpc)
 (straight-use-package 'eglot)
 (require 'eglot)
+(add-hook 'csharp-mode-hook 'eglot-ensure)
+(add-hook 'solidity-mode-hook 'eglot-ensure)
 
 (add-to-list 'eglot-server-programs
              `(solidity-mode . ("solc" "--lsp")))
+(add-to-list 'eglot-server-programs
+             `(csharp-mode . ("~/omnisharp-osx-arm64-net6.0/OmniSharp" "-lsp")))
+
 
 ;;; cape
 
@@ -450,16 +465,6 @@
 (straight-use-package 'csharp-mode)
 (require 'csharp-mode)
 (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
-
-;;; solidity
-
-(straight-use-package 'solidity-mode)
-(require 'solidity-mode)
-(setq solidity-comment-style 'slash)
-(define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point)
-
-;; (straight-use-package 'company-solidity)
-;; (require 'company-solidity)
 
 ;;; eww
 
