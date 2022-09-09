@@ -107,7 +107,7 @@
 (straight-use-package 'ef-themes)
 (require 'ef-themes)
 (mapc #'disable-theme custom-enabled-themes)
-(load-theme 'ef-light :no-confirm)
+(load-theme 'ef-night :no-confirm)
 
 (straight-use-package 'avy)
 (setq avy-keys (number-sequence ?a ?z))
@@ -381,7 +381,7 @@
 (require 'eglot)
 (add-hook 'csharp-mode-hook 'eglot-ensure)
 (add-hook 'solidity-mode-hook 'eglot-ensure)
-
+(add-hook 'sh-mode-hook 'eglot-ensure)
 (add-to-list 'eglot-server-programs
              `(solidity-mode . ("solc" "--lsp")))
 (add-to-list 'eglot-server-programs
