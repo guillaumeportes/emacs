@@ -355,53 +355,68 @@
 (global-flycheck-mode 1)
 
 ;;; lsp
-(setq gc-cons-threshold 100000000)
-(setq read-process-output-max (* 1024 1024)) ;; 1mb
-(straight-use-package 'lsp-mode)
-(require 'lsp-mode)
-(setq lsp-lens-enable nil)
-(add-hook 'csharp-mode-hook #'lsp-deferred)
-(straight-use-package 'lsp-ui)
-(require 'lsp-ui)
+
+;; (setq gc-cons-threshold 100000000)
+;; (setq read-process-output-max (* 1024 1024)) ;; 1mb
+;; (straight-use-package 'lsp-mode)
+;; (require 'lsp-mode)
+;; (setq lsp-lens-enable nil)
+;; (add-hook 'csharp-mode-hook #'lsp-deferred)
+;; (straight-use-package 'lsp-ui)
+;; (require 'lsp-ui)
+
+;;; eglot
+
+(straight-use-package 'eglot)
+(require 'eglot)
+
+(add-to-list 'eglot-server-programs
+             `(solidity-mode . ("solc" "--lsp")))
+
+;;; cape
+
+(straight-use-package 'cape)
+(require 'cape)
+(add-to-list 'completion-at-point-functions #'cape-dabbrev)
 
 ;;; corfu
 
-;; (straight-use-package 'corfu)
-;; (require 'corfu)
-;; (global-corfu-mode)
-;; (setq corfu-auto t)
-;; (define-key corfu-map (kbd "C-m") nil)
+(straight-use-package 'corfu)
+(require 'corfu)
+(global-corfu-mode)
+(setq corfu-auto t)
+(define-key corfu-map (kbd "C-m") nil)
 
-;; (straight-use-package 'kind-icon)
-;; (require 'kind-icon)
-;; (setq kind-icon-default-face 'corfu-default)
-;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+(straight-use-package 'kind-icon)
+(require 'kind-icon)
+(setq kind-icon-default-face 'corfu-default)
+(add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
-;; (straight-use-package 'corfu-doc)
-;; (require 'corfu-doc)
-;; (add-hook 'corfu-mode-hook #'corfu-doc-mode)
+(straight-use-package 'corfu-doc)
+(require 'corfu-doc)
+(add-hook 'corfu-mode-hook #'corfu-doc-mode)
 
 ;;; company
 
-(straight-use-package 'company)
-(require 'company)
-(setq company-global-modes '(not vterm-mode))
-(global-company-mode)
-(define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
-(define-key company-active-map (kbd "C-m") nil)
-(define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
+;; (straight-use-package 'company)
+;; (require 'company)
+;; (setq company-global-modes '(not vterm-mode))
+;; (global-company-mode)
+;; (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
+;; (define-key company-active-map (kbd "C-m") nil)
+;; (define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
 
-(setq company-minimum-prefix-length 1)
-(setq company-idle-delay 0.0)
-(setq company-show-quick-access t)
-(setq company-backends '(company-elisp company-capf))
+;; (setq company-minimum-prefix-length 1)
+;; (setq company-idle-delay 0.0)
+;; (setq company-show-quick-access t)
+;; (setq company-backends '(company-elisp company-capf))
 
-(straight-use-package 'company-box)
-(require 'company-box)
-(add-hook 'company-mode-hook 'company-box-mode)
+;; (straight-use-package 'company-box)
+;; (require 'company-box)
+;; (add-hook 'company-mode-hook 'company-box-mode)
 
-(straight-use-package 'company-lsp)
-(require 'company-lsp)
+;; (straight-use-package 'company-lsp)
+;; (require 'company-lsp)
 
 (straight-use-package 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
@@ -411,18 +426,20 @@
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 
 ;;; slime
-(straight-use-package 'slime)
-(straight-use-package 'slime-company)
-(setq slime-company-completion 'fuzzy
-      slime-company-after-completion 'slime-company-just-one-space)
-(require 'slime-autoloads)
-;(load (expand-file-name "~/quicklisp/slime-helper.el"))
-(setq common-lisp-style-default "sbcl")
-(slime-setup '(slime-fancy slime-company))
+;; (straight-use-package 'slime)
+;; (straight-use-package 'slime-company)
+;; (setq slime-company-completion 'fuzzy
+;;       slime-company-after-completion 'slime-company-just-one-space)
+;; (require 'slime-autoloads)
+;; ;(load (expand-file-name "~/quicklisp/slime-helper.el"))
+;; (setq common-lisp-style-default "sbcl")
+;; (slime-setup '(slime-fancy slime-company))
 
+;;; sly
+(straight-use-package 'sly)
+(require 'sly)
 
-
-(global-set-key (kbd "C-c s") #'slime-selector)
+;; (global-set-key (kbd "C-c s") #'slime-selector)
 
 (global-set-key (kbd "C-M-S-j") 'backward-sexp)
 (global-set-key (kbd "C-M-:") 'forward-sexp)
@@ -441,8 +458,8 @@
 (setq solidity-comment-style 'slash)
 (define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point)
 
-(straight-use-package 'company-solidity)
-(require 'company-solidity)
+;; (straight-use-package 'company-solidity)
+;; (require 'company-solidity)
 
 ;;; eww
 
