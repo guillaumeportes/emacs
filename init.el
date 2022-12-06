@@ -85,29 +85,23 @@
 (straight-use-package 'all-the-icons-completion)
 (all-the-icons-completion-mode 1)
 
-;; (straight-use-package 'doom-modeline)
-;; (require 'doom-modeline)
-;; (doom-modeline-mode 1)
-;; (setq doom-modeline-height 15)
-;; (straight-use-package 'doom-themes)
-;; (require 'doom-themes)
-;; (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-;;       doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;; (load-theme 'doom-one t)
-;; Enable flashing mode-line on errors
-;; (doom-themes-visual-bell-config)
-;; Enable custom neotree theme (all-the-icons must be installed!)
-;; (doom-themes-neotree-config)
-;; or for treemacs users
-;; (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-;; (doom-themes-treemacs-config)
-;; Corrects (and improves) org-mode's native fontification.
-;; (doom-themes-org-config)
-
-(straight-use-package 'ef-themes)
-(require 'ef-themes)
 (mapc #'disable-theme custom-enabled-themes)
-(load-theme 'ef-night :no-confirm)
+
+(straight-use-package 'doom-modeline)
+(require 'doom-modeline)
+(doom-modeline-mode 1)
+(setq doom-modeline-height 15)
+
+(straight-use-package 'doom-themes)
+(setq doom-themes-enable-bold t
+      doom-themes-enable-italic t)
+(load-theme 'doom-one t)
+(doom-themes-visual-bell-config)
+(doom-themes-org-config)
+
+;; (straight-use-package 'ef-themes)
+;; (require 'ef-themes)
+;; (load-theme 'ef-light :no-confirm)
 
 (straight-use-package 'avy)
 (setq avy-keys (number-sequence ?a ?z))
@@ -230,14 +224,14 @@
 (defvar hydra-resize-window-amount 5)
 
 (defhydra hydra-resize-window ()
-  "resize window"
+  "Resize window."
   ("i" (enlarge-window hydra-resize-window-amount) "enlarge vertically")
   ("k" (shrink-window hydra-resize-window-amount) "shrink vertically")
   ("l" (enlarge-window-horizontally hydra-resize-window-amount) "enlarge horizontally")
   ("j" (shrink-window-horizontally hydra-resize-window-amount) "shrink horizontally"))
 
 (defhydra hydra-windmove ()
-  "move window"
+  "Move window."
   ("i" (windmove-up) "move up")
   ("k" (windmove-down) "move down")
   ("j" (windmove-left) "move left")
@@ -256,13 +250,13 @@
 (global-set-key (kbd "C-c w") 'window-key-map)
 
 (defhydra hydra-winner ()
-  "winner undo / redo"
+  "Winner undo / redo."
   ("j" (progn (winner-undo) (setq this-command 'winner-undo)) "winner undo")
   ("l" (winner-redo) "winner redo"))
 (define-key 'window-key-map (kbd "w") 'hydra-winner/body)
 
 (defhydra hydra-other-window (:timeout 4)
-  "other window"
+  "Other window."
   ("n" (other-window 1) "next")
   ("p" (other-window -1) "previous")
   ("f" nil "finished" :exit t))
@@ -388,12 +382,6 @@
              `(csharp-mode . ("~/omnisharp-osx-arm64-net6.0/OmniSharp" "-lsp")))
 
 
-;;; cape
-
-(straight-use-package 'cape)
-(require 'cape)
-(add-to-list 'completion-at-point-functions #'cape-dabbrev)
-
 ;;; corfu
 
 (straight-use-package 'corfu)
@@ -407,9 +395,12 @@
 (setq kind-icon-default-face 'corfu-default)
 (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
-(straight-use-package 'corfu-doc)
-(require 'corfu-doc)
-(add-hook 'corfu-mode-hook #'corfu-doc-mode)
+;;; cape
+
+(straight-use-package 'cape)
+(require 'cape)
+(add-to-list 'completion-at-point-functions #'cape-dabbrev)
+(add-to-list 'completion-at-point-functions #'cape-file)
 
 ;;; company
 
@@ -441,18 +432,21 @@
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 
 ;;; slime
-;; (straight-use-package 'slime)
-;; (straight-use-package 'slime-company)
-;; (setq slime-company-completion 'fuzzy
-;;       slime-company-after-completion 'slime-company-just-one-space)
-;; (require 'slime-autoloads)
-;; ;(load (expand-file-name "~/quicklisp/slime-helper.el"))
-;; (setq common-lisp-style-default "sbcl")
-;; (slime-setup '(slime-fancy slime-company))
+;;; (straight-use-package 'slime)
+;;; (straight-use-package 'slime-company)
+;;; (setq slime-company-completion 'fuzzy
+;;;      slime-company-after-completion 'slime-company-just-one-space)
+;;; (require 'slime-autoloads)
+;;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
+;;; (setq common-lisp-style-default "sbcl")
+;;; (slime-setup '(slime-fancy slime-company))
 
 ;;; sly
 (straight-use-package 'sly)
 (require 'sly)
+
+(load "~/quicklisp/log4sly-setup.el")
+(global-log4sly-mode 1)
 
 ;; (global-set-key (kbd "C-c s") #'slime-selector)
 
@@ -483,3 +477,15 @@
 (straight-use-package 'dockerfile-mode)
 (require 'dockerfile-mode)
 
+;;; latex
+
+(straight-use-package 'auctex)
+
+;;; medium
+
+;;; org
+
+;;; (define-key org-mode-map (kbd "C-,") 'org-delete-backward-char)
+
+(provide 'init)
+;;; init.el ends here
