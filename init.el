@@ -384,9 +384,11 @@
 
 ;;; corfu
 
-(straight-use-package 'corfu)
+(straight-use-package '(corfu :files ("*" (:exclude ".git") "extensions/*")))
 (require 'corfu)
 (global-corfu-mode)
+(corfu-popupinfo-mode)
+(setq corfu-popupinfo-delay 0.1)
 (setq corfu-auto t)
 (define-key corfu-map (kbd "C-m") nil)
 
@@ -456,7 +458,7 @@
 (global-set-key (kbd "C-M-S-l") #'(lambda () (interactive) (re-search-forward "[()]")))
 
 ;;; csharp
-(straight-use-package 'csharp-mode)
+;(straight-use-package 'csharp-mode)
 (require 'csharp-mode)
 (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
 
