@@ -5,11 +5,11 @@
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
+      (bootstrap-version 6))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
          'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
@@ -159,10 +159,10 @@
 
 (straight-use-package 'consult)
 (require 'consult)
-(global-set-key (kbd "C-x b") 'consult-buffer)
-(global-set-key (kbd "C-x p b") 'consult-project-buffer)
-(global-set-key (kbd "M-g m") 'consult-mark)
-(global-set-key (kbd "M-g i") 'consult-imenu)
+(consult-customize consult-buffer :preview-key "C-x b")
+(consult-customize consult-project-buffer :preview-key "C-x p b")
+(consult-customize consult-mark :preview-key "M-g m")
+(consult-customize consult-imenu :preview-key "M-g i")
 
 (consult-customize
  consult--source-buffer
@@ -434,18 +434,31 @@
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 
 ;;; slime
-;;; (straight-use-package 'slime)
-;;; (straight-use-package 'slime-company)
-;;; (setq slime-company-completion 'fuzzy
-;;;      slime-company-after-completion 'slime-company-just-one-space)
-;;; (require 'slime-autoloads)
-;;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
-;;; (setq common-lisp-style-default "sbcl")
-;;; (slime-setup '(slime-fancy slime-company))
+;; (straight-use-package 'slime)
+;; (straight-use-package 'slime-company)
+;; (setq slime-company-completion 'fuzzy
+;;      slime-company-after-completion 'slime-company-just-one-space)
+;; (require 'slime-autoloads)
+;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
+;; (setq common-lisp-style-default "sbcl")
+;; (slime-setup '(slime-fancy slime-company))
 
 ;;; sly
 (straight-use-package 'sly)
 (require 'sly)
+
+(defun enable-sly-tramp ()
+  (interactive)
+  (add-to-list 'sly-filename-translations (sly-create-filename-translator :machine-instance (sly-machine-instance)
+                                                                          :remote-host "ccg-server"
+                                                                          :username "root")))
+
+(defun disable-sly-tramp ()
+  (interactive)
+  (setq sly-filename-translations (remove (nth (1- (length sly-filename-translations)) sly-filename-translations) sly-filename-translations)))
+
+(add-to-list 'tramp-default-method-alist '("" "root" "ssh"))
+(customize-set-variable 'tramp-default-method "ssh")
 
 (load "~/quicklisp/log4sly-setup.el")
 (global-log4sly-mode 1)
