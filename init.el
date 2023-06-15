@@ -434,14 +434,15 @@
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 
 ;;; slime
+
+;; (straight-use-package '(slime-cape :type git :host github :repo "ccqpein/slime-cape"))
 ;; (straight-use-package 'slime)
-;; (straight-use-package 'slime-company)
-;; (setq slime-company-completion 'fuzzy
-;;      slime-company-after-completion 'slime-company-just-one-space)
+;; (require 'slime)
+
 ;; (require 'slime-autoloads)
 ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
 ;; (setq common-lisp-style-default "sbcl")
-;; (slime-setup '(slime-fancy slime-company))
+;; (slime-setup '(slime-fancy slime-repl slime-scratch slime-trace-dialog slime-cl-indent slime-cape))
 
 ;;; sly
 (straight-use-package 'sly)
