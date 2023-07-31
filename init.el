@@ -160,7 +160,9 @@
 (straight-use-package 'consult)
 (require 'consult)
 (consult-customize consult-buffer :preview-key "C-x b")
+(global-set-key (kbd "C-x b") #'consult-buffer)
 (consult-customize consult-project-buffer :preview-key "C-x p b")
+(global-set-key (kbd "C-x p b") #'consult-project-buffer)
 (consult-customize consult-mark :preview-key "M-g m")
 (consult-customize consult-imenu :preview-key "M-g i")
 
@@ -502,6 +504,26 @@
 ;;; org
 
 ;;; (define-key org-mode-map (kbd "C-,") 'org-delete-backward-char)
+
+(defun create-card ()
+  "Create a new card."
+  (interactive)
+  (let* ((file-name (read-file-name "Enter file name: "))
+         (inheritance (read-string "Enter inherited classes: "))
+         (card-name (file-name-sans-extension (file-name-nondirectory file-name))))
+    (find-file file-name)
+    (insert (format ";;;; %s\n\n" card-name))
+    (insert "(in-package :tinka.ccg.cards)")
+    (insert "\n\n")
+    (insert (format "(defcard %s (%s) ("  card-name inheritance))
+    (insert ":data-id ")
+    (insert "(defdata-id)")
+    (sly-macroexpand-1-inplace)
+    (insert "\n")
+    (insert ":cost ()\n:display-name \"\"\n:description \"\")\n)")
+    (indent-region 0 (point-max))))
+
+(global-set-key (kbd "C-c c") #'create-card)
 
 (provide 'init)
 ;;; init.el ends here
