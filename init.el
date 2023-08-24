@@ -520,10 +520,13 @@
     (insert "(defdata-id)")
     (sly-macroexpand-1-inplace)
     (insert "\n")
-    (insert ":cost ()\n:display-name \"\"\n:description \"\")\n)")
+    (insert ":rarity :common\n:cost ()\n:display-name \"\"\n:description \"\")\n)")
     (indent-region 0 (point-max))))
 
 (global-set-key (kbd "C-c c") #'create-card)
+
+(straight-use-package 'ztree)
+(straight-use-package 'markdown-mode)
 
 (provide 'init)
 ;;; init.el ends here
