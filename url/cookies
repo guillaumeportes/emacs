@@ -1,0 +1,17 @@
+;; Emacs-W3 HTTP cookies file
+;; Automatically generated file!!! DO NOT EDIT!!!
+
+(setq url-cookie-storage
+ '((".redis.io"
+  [url-cookie "visid_incap_2333592" "Wcn3aNXSRCqBZpa/maPob+0T92QAAAAAQUIPAAAAAADw6Zb9Mv9ubz7C/yhPi4rh" "Tue, 03 Sep 2024 22:19:42 GMT" "/" ".redis.io" nil]))
+)
+(setq url-cookie-secure-storage
+ 'nil)
+
+;; Local Variables:
+;; version-control: never
+;; no-byte-compile: t
+;; coding: utf-8-emacs-unix
+;; End:
+
+;;; cookies ends here

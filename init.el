@@ -473,11 +473,6 @@
 (global-set-key (kbd "C-M-S-k") #'(lambda () (interactive) (re-search-backward "[()]")))
 (global-set-key (kbd "C-M-S-l") #'(lambda () (interactive) (re-search-forward "[()]")))
 
-;;; csharp
-(straight-use-package 'csharp-mode)
-(require 'csharp-mode)
-(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
-
 ;;; eww
 
 (setq
