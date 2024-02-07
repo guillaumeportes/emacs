@@ -134,7 +134,7 @@
 (straight-use-package 'vertico)
 (require 'vertico)
 (vertico-mode 1)
-(require 'vertico-directory "extensions/vertico-directory.el")
+(require 'vertico-directory)
 (define-key vertico-map (kbd "RET") 'vertico-directory-enter)
 (define-key vertico-map (kbd "DEL") 'vertico-directory-delete-char)
 (define-key vertico-map (kbd "M-DEL") 'vertico-directory-delete-word)
@@ -150,7 +150,8 @@
 (require 'orderless)
 (setq completion-styles '(orderless basic)
       completion-category-defaults nil
-      completion-category-overrides '((file (styles partial-completion))))
+      completion-category-overrides '((file (styles partial-completion))
+                                      (eglot (styles orderless))))
 
 (straight-use-package 'marginalia)
 (require 'marginalia)
@@ -283,7 +284,7 @@
 ; ( - dired-hide-details
 
 (setq dired-listing-switches "-agho --group-directories-first")
-(setq insert-directory-program "/usr/local/bin/gls")
+(setq insert-directory-program "/opt/homebrew/bin/gls")
 (setq delete-by-moving-to-trash t)
 (global-set-key (kbd "C-x C-g") 'dired-jump)
 
@@ -373,60 +374,71 @@
 (straight-use-package 'xref)
 (straight-use-package 'eldoc)
 (straight-use-package 'jsonrpc)
-(straight-use-package 'eglot)
-(require 'eglot)
-(add-hook 'csharp-mode-hook 'eglot-ensure)
-(add-hook 'solidity-mode-hook 'eglot-ensure)
-(add-hook 'sh-mode-hook 'eglot-ensure)
-(add-to-list 'eglot-server-programs
-             `(solidity-mode . ("solc" "--lsp")))
-(add-to-list 'eglot-server-programs
-             `(csharp-mode . ("~/omnisharp-osx-arm64-net6.0/OmniSharp" "-lsp")))
 
+; (straight-use-package 'eglot)
+;(require 'eglot)
+(add-hook 'csharp-mode-hook 'eglot-ensure)
+;(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+;(add-hook 'solidity-mode-hook 'eglot-ensure)
+;(add-hook 'sh-mode-hook 'eglot-ensure)
+;(add-to-list 'eglot-server-programs
+;             `(solidity-mode . ("solc" "--lsp")))
+;(add-to-list 'eglot-server-programs
+;             `(csharp-mode . ("~/omnisharp-osx-arm64-net6.0/OmniSharp" "-lsp")))
+
+;;; lsp-mode
+
+;(straight-use-package 'lsp-mode)
+;(setq lsp-csharp-server-path "mono ~/omnisharp-mono/OmniSharp.exe")
+;(require 'lsp-mode)
+;(straight-use-package 'lsp-ui)
+;(setq lsp-completion-provider :none)
+;(add-hook 'csharp-mode-hook #'lsp)
+;(setq lsp-headerline-breadcrumb-enable nil)
+;(setq lsp-lens-enable nil)
 
 ;;; corfu
 
-(straight-use-package '(corfu :files ("*" (:exclude ".git") "extensions/*")))
-(require 'corfu)
-(global-corfu-mode)
-(corfu-popupinfo-mode)
-(setq corfu-popupinfo-delay 0.1)
-(setq corfu-auto t)
-(define-key corfu-map (kbd "C-m") nil)
+;; (straight-use-package '(corfu :files ("*" (:exclude ".git") "extensions/*")))
+;; (require 'corfu)
+;; (global-corfu-mode)
+;; (corfu-popupinfo-mode)
+;; (setq corfu-popupinfo-delay 0.1)
+;; (setq corfu-auto t)
+;; (define-key corfu-map (kbd "C-m") nil)
 
-(straight-use-package 'kind-icon)
-(require 'kind-icon)
-(setq kind-icon-default-face 'corfu-default)
-(add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+;; (straight-use-package 'kind-icon)
+;; (require 'kind-icon)
+;; (setq kind-icon-default-face 'corfu-default)
+;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
 ;;; cape
 
-(straight-use-package 'cape)
-(require 'cape)
-(add-to-list 'completion-at-point-functions #'cape-dabbrev)
-(add-to-list 'completion-at-point-functions #'cape-file)
+;; (straight-use-package 'cape)
+;; (require 'cape)
+;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+;; (add-to-list 'completion-at-point-functions #'cape-file)
 
 ;;; company
 
-;; (straight-use-package 'company)
-;; (require 'company)
-;; (setq company-global-modes '(not vterm-mode))
-;; (global-company-mode)
-;; (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
-;; (define-key company-active-map (kbd "C-m") nil)
-;; (define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
+(straight-use-package 'company)
+(require 'company)
+(setq company-global-modes '(not vterm-mode))
+(global-company-mode)
+(define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
+(define-key company-active-map (kbd "C-m") nil)
+(define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
 
-;; (setq company-minimum-prefix-length 1)
-;; (setq company-idle-delay 0.0)
-;; (setq company-show-quick-access t)
-;; (setq company-backends '(company-elisp company-capf))
+(setq company-minimum-prefix-length 1)
+(setq company-idle-delay 0.2)
+(setq company-show-quick-access t)
+(setq company-backends '(company-elisp company-capf))
 
-;; (straight-use-package 'company-box)
-;; (require 'company-box)
-;; (add-hook 'company-mode-hook 'company-box-mode)
+(straight-use-package 'company-box)
+(require 'company-box)
+(add-hook 'company-mode-hook 'company-box-mode)
 
-;; (straight-use-package 'company-lsp)
-;; (require 'company-lsp)
+(eldoc-add-command 'c-electric-paren)
 
 (straight-use-package 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
@@ -460,11 +472,11 @@
   (interactive)
   (setq sly-filename-translations (remove (nth (1- (length sly-filename-translations)) sly-filename-translations) sly-filename-translations)))
 
-(add-to-list 'tramp-default-method-alist '("" "root" "ssh"))
-(customize-set-variable 'tramp-default-method "ssh")
+;(add-to-list 'tramp-default-method-alist '("" "root" "ssh"))
+;(customize-set-variable 'tramp-default-method "ssh")
 
-(load "~/quicklisp/log4sly-setup.el")
-(global-log4sly-mode 1)
+;(load "~/quicklisp/log4sly-setup.el")
+;(global-log4sly-mode 1)
 
 ;; (global-set-key (kbd "C-c s") #'slime-selector)
 
@@ -497,6 +509,8 @@
 ;;; medium
 
 ;;; org
+
+(add-hook 'org-mode-hook #'(lambda () (setq truncate-lines nil)))
 
 ;;; (define-key org-mode-map (kbd "C-,") 'org-delete-backward-char)
 
