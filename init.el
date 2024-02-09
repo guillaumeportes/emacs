@@ -1,20 +1,8 @@
-;; -*- lexical-binding: t -*-
+;; packages
 
-;; straight.el stuff
-
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-(setq package-enable-at-startup nil)
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(package-refresh-contents)
 
 ;; general settings
 
@@ -77,49 +65,49 @@
 (set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 140)
 (set-face-attribute 'variable-pitch nil :font "Hack" :height 160 :weight 'regular)
 
-(straight-use-package 'all-the-icons)
+(package-install 'all-the-icons)
 (require 'all-the-icons)
 (unless (find-font (font-spec :name "all-the-icons"))
   (all-the-icons-install-fonts t))
 
-(straight-use-package 'all-the-icons-completion)
+(package-install 'all-the-icons-completion)
 (all-the-icons-completion-mode 1)
 
 (mapc #'disable-theme custom-enabled-themes)
 
-(straight-use-package 'doom-modeline)
+(package-install 'doom-modeline)
 (require 'doom-modeline)
 (doom-modeline-mode 1)
 (setq doom-modeline-height 15)
 
-(straight-use-package 'doom-themes)
+(package-install 'doom-themes)
 (setq doom-themes-enable-bold t
       doom-themes-enable-italic t)
 (load-theme 'doom-one t)
 (doom-themes-visual-bell-config)
 (doom-themes-org-config)
 
-;; (straight-use-package 'ef-themes)
+;; (package-install 'ef-themes)
 ;; (require 'ef-themes)
 ;; (load-theme 'ef-light :no-confirm)
 
-(straight-use-package 'avy)
+(package-install 'avy)
 (setq avy-keys (number-sequence ?a ?z))
 (require 'avy)
 (global-set-key (kbd "C-'") 'avy-goto-word-1-below)
 (global-set-key (kbd "C-\"") 'avy-goto-word-1-above)
 
-(straight-use-package 'rainbow-delimiters)
+(package-install 'rainbow-delimiters)
 (require 'rainbow-delimiters)
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
-(straight-use-package 'highlight-parentheses)
+(package-install 'highlight-parentheses)
 (require 'highlight-parentheses)
 (add-hook 'prog-mode-hook 'highlight-parentheses-mode)
 
 ;; helpful
 
-(straight-use-package 'helpful)
+(package-install 'helpful)
 (require 'helpful)
 
 (global-set-key (kbd "C-h f") #'helpful-callable)
@@ -131,7 +119,7 @@
 
 ;; Completion
 
-(straight-use-package 'vertico)
+(package-install 'vertico)
 (require 'vertico)
 (vertico-mode 1)
 (require 'vertico-directory)
@@ -146,19 +134,19 @@
 (setq read-extended-command-predicate #'command-completion-default-include-p)
 (setq enable-recursive-minibuffers t)
 
-(straight-use-package 'orderless)
+(package-install 'orderless)
 (require 'orderless)
 (setq completion-styles '(orderless basic)
       completion-category-defaults nil
       completion-category-overrides '((file (styles partial-completion))
                                       (eglot (styles orderless))))
 
-(straight-use-package 'marginalia)
+(package-install 'marginalia)
 (require 'marginalia)
 (define-key minibuffer-local-map (kbd "M-A") 'marginalia-cycle)
 (marginalia-mode 1)
 
-(straight-use-package 'consult)
+(package-install 'consult)
 (require 'consult)
 (consult-customize consult-buffer :preview-key "C-x b")
 (global-set-key (kbd "C-x b") #'consult-buffer)
@@ -172,7 +160,7 @@
  consult--source-bookmark consult--source-recent-file
  consult--source-project-recent-file :preview-key (kbd "M-."))
 
-(straight-use-package 'pulsar)
+(package-install 'pulsar)
 (require 'pulsar)
 (setq pulsar-pulse-functions
       '(isearch-repeat-forward
@@ -222,7 +210,7 @@
 
 (winner-mode 1)
 
-(straight-use-package 'hydra)
+(package-install 'hydra)
 
 (defvar hydra-resize-window-amount 5)
 
@@ -288,18 +276,18 @@
 (setq delete-by-moving-to-trash t)
 (global-set-key (kbd "C-x C-g") 'dired-jump)
 
-(straight-use-package 'dired-single)
-(straight-use-package 'all-the-icons-dired)
+(package-install 'dired-single)
+(package-install 'all-the-icons-dired)
 (if (display-graphic-p)
     (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 
-(straight-use-package 'command-log-mode)
+(package-install 'command-log-mode)
 (require 'command-log-mode)
 
-(straight-use-package 'diminish)
+(package-install 'diminish)
 (require 'diminish)
 
-(straight-use-package 'which-key)
+(package-install 'which-key)
 (require 'which-key)
 (which-key-mode 1)
 (diminish 'which-key-mode)
@@ -307,27 +295,27 @@
 
 ;; vc
 
-(straight-use-package 'git-gutter)
+(package-install 'git-gutter)
 (require 'git-gutter)
 (global-git-gutter-mode 1)
 
-(straight-use-package 'magit)
+(package-install 'magit)
 (require 'magit)
 (define-key magit-section-mode-map (kbd "C-<tab>") nil)
 (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 
 ;; shell
 
-(straight-use-package 'exec-path-from-shell)
+(package-install 'exec-path-from-shell)
 (require 'exec-path-from-shell)
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
-(straight-use-package 'vterm)
+(package-install 'vterm)
 (require 'vterm)
 (setq vterm-max-scrollback 10000)
 
-(straight-use-package 'multi-vterm)
+(package-install 'multi-vterm)
 (require 'multi-vterm)
 
 (defun configure-eshell ()
@@ -345,37 +333,37 @@
   (setq eshell-visual-commands '("htop" "zsh" "vim"))
   (eshell-git-prompt-use-theme 'powerline))
 
-(straight-use-package 'eshell-git-prompt)
+(package-install 'eshell-git-prompt)
 (require 'eshell-git-prompt)
 
 ;; languages
 
-;; (straight-use-package 'flycheck)
+;; (package-install 'flycheck)
 ;; (require 'flycheck)
 ;; (global-flycheck-mode 1)
 
-(straight-use-package 'flymake)
+(package-install 'flymake)
 (require 'flymake)
 (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
 (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
 (add-hook 'emacs-lisp-mode-hook 'flymake-mode)
 
-(straight-use-package 'solidity-mode)
+(package-install 'solidity-mode)
 (require 'solidity-mode)
 (setq solidity-comment-style 'slash)
 (define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point)
 
-;; (straight-use-package 'company-solidity)
+;; (package-install 'company-solidity)
 ;; (require 'company-solidity)
 
 ;;; eglot
 
-(straight-use-package 'project)
-(straight-use-package 'xref)
-(straight-use-package 'eldoc)
-(straight-use-package 'jsonrpc)
+(package-install 'project)
+(package-install 'xref)
+(package-install 'eldoc)
+(package-install 'jsonrpc)
 
-; (straight-use-package 'eglot)
+; (package-install 'eglot)
 ;(require 'eglot)
 (add-hook 'csharp-mode-hook 'eglot-ensure)
 ;(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
@@ -388,10 +376,10 @@
 
 ;;; lsp-mode
 
-;(straight-use-package 'lsp-mode)
+;(package-install 'lsp-mode)
 ;(setq lsp-csharp-server-path "mono ~/omnisharp-mono/OmniSharp.exe")
 ;(require 'lsp-mode)
-;(straight-use-package 'lsp-ui)
+;(package-install 'lsp-ui)
 ;(setq lsp-completion-provider :none)
 ;(add-hook 'csharp-mode-hook #'lsp)
 ;(setq lsp-headerline-breadcrumb-enable nil)
@@ -399,7 +387,7 @@
 
 ;;; corfu
 
-;; (straight-use-package '(corfu :files ("*" (:exclude ".git") "extensions/*")))
+;; (package-install '(corfu :files ("*" (:exclude ".git") "extensions/*")))
 ;; (require 'corfu)
 ;; (global-corfu-mode)
 ;; (corfu-popupinfo-mode)
@@ -407,21 +395,21 @@
 ;; (setq corfu-auto t)
 ;; (define-key corfu-map (kbd "C-m") nil)
 
-;; (straight-use-package 'kind-icon)
+;; (package-install 'kind-icon)
 ;; (require 'kind-icon)
 ;; (setq kind-icon-default-face 'corfu-default)
 ;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
 ;;; cape
 
-;; (straight-use-package 'cape)
+;; (package-install 'cape)
 ;; (require 'cape)
 ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
 ;; (add-to-list 'completion-at-point-functions #'cape-file)
 
 ;;; company
 
-(straight-use-package 'company)
+(package-install 'company)
 (require 'company)
 (setq company-global-modes '(not vterm-mode))
 (global-company-mode)
@@ -434,13 +422,13 @@
 (setq company-show-quick-access t)
 (setq company-backends '(company-elisp company-capf))
 
-(straight-use-package 'company-box)
+(package-install 'company-box)
 (require 'company-box)
 (add-hook 'company-mode-hook 'company-box-mode)
 
 (eldoc-add-command 'c-electric-paren)
 
-(straight-use-package 'evil-nerd-commenter)
+(package-install 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
 (global-set-key (kbd "C-c C-c") 'evilnc-comment-or-uncomment-lines)
 
@@ -449,8 +437,8 @@
 
 ;;; slime
 
-;; (straight-use-package '(slime-cape :type git :host github :repo "ccqpein/slime-cape"))
-;; (straight-use-package 'slime)
+;; (package-install '(slime-cape :type git :host github :repo "ccqpein/slime-cape"))
+;; (package-install 'slime)
 ;; (require 'slime)
 
 ;; (require 'slime-autoloads)
@@ -459,7 +447,7 @@
 ;; (slime-setup '(slime-fancy slime-repl slime-scratch slime-trace-dialog slime-cl-indent slime-cape))
 
 ;;; sly
-(straight-use-package 'sly)
+(package-install 'sly)
 (require 'sly)
 
 (defun enable-sly-tramp ()
@@ -495,16 +483,16 @@
  shr-width 70                                ; Fold text to 70 columns
  eww-search-prefix "https://wiby.me/?q=")    ; Use another engine for searching
 
-(straight-use-package 'docker)
+(package-install 'docker)
 (require 'docker)
-(straight-use-package 'docker-compose-mode)
+(package-install 'docker-compose-mode)
 (require 'docker-compose-mode)
-(straight-use-package 'dockerfile-mode)
+(package-install 'dockerfile-mode)
 (require 'dockerfile-mode)
 
 ;;; latex
 
-(straight-use-package 'auctex)
+(package-install 'auctex)
 
 ;;; medium
 
@@ -534,8 +522,8 @@
 
 (global-set-key (kbd "C-c c") #'create-card)
 
-(straight-use-package 'ztree)
-(straight-use-package 'markdown-mode)
+(package-install 'ztree)
+(package-install 'markdown-mode)
 
 (provide 'init)
 ;;; init.el ends here
