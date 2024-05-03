@@ -363,6 +363,15 @@
 (package-install 'eldoc)
 (package-install 'jsonrpc)
 
+;;; dape
+;; (setq exec-path (cons "~/netcoredbg/bin" exec-path))
+;; (add-to-list 'dape-configs
+;;              `(unity modes
+;;                      (csharp-mode csharp-ts-mode)
+;;                      ensure dape-ensure-command command "~/.vscode/extensions/p1gd0g.unity-debug-301-4.0.1/bin/UnityDebug.exe" :request "launch" command-args
+;;                      ["--interpreter=vscode"]
+;;                      :cwd dape-cwd :program dape--netcoredbg-program :stopAtEntry nil))
+
 ; (package-install 'eglot)
 ;(require 'eglot)
 (add-hook 'csharp-mode-hook 'eglot-ensure)
@@ -412,6 +421,7 @@
 (package-install 'company)
 (require 'company)
 (setq company-global-modes '(not vterm-mode))
+(setq company-keywords-ignore-case t)
 (global-company-mode)
 (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
 (define-key company-active-map (kbd "C-m") nil)
