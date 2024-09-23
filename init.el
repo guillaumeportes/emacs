@@ -373,8 +373,12 @@
 ;;                      :cwd dape-cwd :program dape--netcoredbg-program :stopAtEntry nil))
 
 ; (package-install 'eglot)
-;(require 'eglot)
+                                        ;(require 'eglot)
 (add-hook 'csharp-mode-hook 'eglot-ensure)
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(csharp-mode . ("csharp-ls"))))
+(setq tab-width 4)
 ;(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 ;(add-hook 'solidity-mode-hook 'eglot-ensure)
 ;(add-hook 'sh-mode-hook 'eglot-ensure)
