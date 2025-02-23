@@ -372,20 +372,21 @@
 ;;                      ["--interpreter=vscode"]
 ;;                      :cwd dape-cwd :program dape--netcoredbg-program :stopAtEntry nil))
 
-; (package-install 'eglot)
-                                        ;(require 'eglot)
+
 (add-hook 'csharp-mode-hook 'eglot-ensure)
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
                '(csharp-mode . ("csharp-ls"))))
-(setq tab-width 4)
+
+(setq-default tab-width 4)
 ;(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 ;(add-hook 'solidity-mode-hook 'eglot-ensure)
 ;(add-hook 'sh-mode-hook 'eglot-ensure)
 ;(add-to-list 'eglot-server-programs
 ;             `(solidity-mode . ("solc" "--lsp")))
 ;(add-to-list 'eglot-server-programs
-;             `(csharp-mode . ("~/omnisharp-osx-arm64-net6.0/OmniSharp" "-lsp")))
+                                        ;             `(csharp-mode . ("~/omnisharp-osx-arm64-net6.0/OmniSharp" "-lsp")))
+(global-set-key (kbd "C-c e r") #'eglot-reconnect)
 
 ;;; lsp-mode
 
@@ -538,6 +539,16 @@
 
 (package-install 'ztree)
 (package-install 'markdown-mode)
+
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+
+(defun my-emacsclient-foreground ()
+  "Bring Emacs to the foreground using AppleScript."
+  (start-process "emacs-foreground" nil "osascript" (expand-file-name "~/bring_emacs_to_foreground.applescript")))
+
+(add-hook 'server-visit-hook 'my-emacsclient-foreground)
 
 (provide 'init)
 ;;; init.el ends here
