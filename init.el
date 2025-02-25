@@ -80,16 +80,20 @@
 (doom-modeline-mode 1)
 (setq doom-modeline-height 15)
 
-(package-install 'doom-themes)
-(setq doom-themes-enable-bold t
-      doom-themes-enable-italic t)
-(load-theme 'doom-one t)
-(doom-themes-visual-bell-config)
-(doom-themes-org-config)
+;; (package-install 'doom-themes)
+;; (setq doom-themes-enable-bold t
+;;       doom-themes-enable-italic t)
+;; (load-theme 'doom-one t)
+;; (doom-themes-visual-bell-config)
+;; (doom-themes-org-config)
 
-;; (package-install 'ef-themes)
-;; (require 'ef-themes)
-;; (load-theme 'ef-light :no-confirm)
+;; (package-install 'modus-themes)
+;; (require 'modus-themes)
+;; (load-theme 'modus-vivendi :no-confirm)
+
+(package-install 'ef-themes)
+(require 'ef-themes)
+(load-theme 'ef-light :no-confirm)
 
 (package-install 'avy)
 (setq avy-keys (number-sequence ?a ?z))
@@ -374,7 +378,11 @@
 
 
 (add-hook 'csharp-mode-hook 'eglot-ensure)
+(add-to-list 'load-path "~/emacs/eglot-x")
 (with-eval-after-load 'eglot
+  (require 'eglot-x)
+  (eglot-x-setup)
+  (setq eglot-sync-connect nil)
   (add-to-list 'eglot-server-programs
                '(csharp-mode . ("csharp-ls"))))
 
@@ -402,17 +410,21 @@
 ;;; corfu
 
 ;; (package-install '(corfu :files ("*" (:exclude ".git") "extensions/*")))
-;; (require 'corfu)
-;; (global-corfu-mode)
-;; (corfu-popupinfo-mode)
-;; (setq corfu-popupinfo-delay 0.1)
-;; (setq corfu-auto t)
-;; (define-key corfu-map (kbd "C-m") nil)
+(require 'corfu)
+(global-corfu-mode)
+(corfu-popupinfo-mode)
+(corfu-echo-mode)
+(corfu-history-mode)
+(setq corfu-popupinfo-delay 0.1)
+(setq corfu-auto-delay 0.1)
+(setq corfu-auto t)
+(setq corfu-auto-prefix 2)
+(define-key corfu-map (kbd "C-m") nil)
 
-;; (package-install 'kind-icon)
-;; (require 'kind-icon)
-;; (setq kind-icon-default-face 'corfu-default)
-;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+(package-install 'kind-icon)
+(require 'kind-icon)
+(setq kind-icon-default-face 'corfu-default)
+(add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
 ;;; cape
 
@@ -423,23 +435,23 @@
 
 ;;; company
 
-(package-install 'company)
-(require 'company)
-(setq company-global-modes '(not vterm-mode))
-(setq company-keywords-ignore-case t)
-(global-company-mode)
-(define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
-(define-key company-active-map (kbd "C-m") nil)
-(define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
+;; (package-install 'company)
+;; (require 'company)
+;; (setq company-global-modes '(not vterm-mode))
+;; (setq company-keywords-ignore-case t)
+;; (global-company-mode)
+;; (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
+;; (define-key company-active-map (kbd "C-m") nil)
+;; (define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
 
-(setq company-minimum-prefix-length 1)
-(setq company-idle-delay 0.2)
-(setq company-show-quick-access t)
-(setq company-backends '(company-elisp company-capf))
+;; (setq company-minimum-prefix-length 1)
+;; (setq company-idle-delay 0.2)
+;; (setq company-show-quick-access t)
+;; (setq company-backends '(company-elisp company-capf))
 
-(package-install 'company-box)
-(require 'company-box)
-(add-hook 'company-mode-hook 'company-box-mode)
+;; (package-install 'company-box)
+;; (require 'company-box)
+;; (add-hook 'company-mode-hook 'company-box-mode)
 
 (eldoc-add-command 'c-electric-paren)
 
