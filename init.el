@@ -378,10 +378,7 @@
 
 
 (add-hook 'csharp-mode-hook 'eglot-ensure)
-(add-to-list 'load-path "~/emacs/eglot-x")
 (with-eval-after-load 'eglot
-  (require 'eglot-x)
-  (eglot-x-setup)
   (setq eglot-sync-connect nil)
   (add-to-list 'eglot-server-programs
                '(csharp-mode . ("csharp-ls"))))
@@ -421,10 +418,13 @@
 (setq corfu-auto-prefix 2)
 (define-key corfu-map (kbd "C-m") nil)
 
-(package-install 'kind-icon)
-(require 'kind-icon)
-(setq kind-icon-default-face 'corfu-default)
-(add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+;; (package-install 'kind-icon)
+;; (require 'kind-icon)
+;; (setq kind-icon-default-face 'corfu-default)
+;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+
+(package-install 'nerd-icons-corfu)
+(add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
 
 ;;; cape
 
@@ -547,7 +547,7 @@
     (insert ":rarity :common\n:cost ()\n:display-name \"\"\n:description \"\")\n)")
     (indent-region 0 (point-max))))
 
-(global-set-key (kbd "C-c c") #'create-card)
+;; (global-set-key (kbd "C-c c") #'create-card)
 
 (package-install 'ztree)
 (package-install 'markdown-mode)
@@ -561,6 +561,13 @@
   (start-process "emacs-foreground" nil "osascript" (expand-file-name "~/bring_emacs_to_foreground.applescript")))
 
 (add-hook 'server-visit-hook 'my-emacsclient-foreground)
+
+(package-install 'copilot)
+(require 'copilot)
+(add-hook 'prog-mode-hook 'copilot-mode)
+(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+(define-key copilot-completion-map (kbd "C-m") 'copilot-accept-completion)
 
 (provide 'init)
 ;;; init.el ends here
