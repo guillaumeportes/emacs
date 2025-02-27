@@ -93,7 +93,7 @@
 
 (package-install 'ef-themes)
 (require 'ef-themes)
-(load-theme 'ef-light :no-confirm)
+(load-theme 'ef-summer :no-confirm)
 
 (package-install 'avy)
 (setq avy-keys (number-sequence ?a ?z))
@@ -567,7 +567,17 @@
 (add-hook 'prog-mode-hook 'copilot-mode)
 (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
 (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
-(define-key copilot-completion-map (kbd "C-m") 'copilot-accept-completion)
+(add-to-list 'copilot-indentation-alist '(csharp-mode 4))
+
+(package-install 'embark)
+(require 'embark)
+(global-set-key (kbd "C-;") 'embark-act)
+
+(require 'embark-consult)
+
+(package-install 'vundo)
+(require 'vundo)
+(setq vundo-glyph-alist vundo-unicode-symbols)
 
 (provide 'init)
 ;;; init.el ends here
