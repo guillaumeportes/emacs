@@ -1,8 +1,17 @@
 ;; packages
 
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 (package-refresh-contents)
+
+(defvar packages
+  '(all-the-icons all-the-icons-completion doom-modeline ef-themes avy rainbow-delimiters highlight-parentheses helpful vertico orderless marginalia consult pulsar hydra all-the-icons-dired command-log-mode diminish which-key git-gutter magit exec-path-from-shell vterm multi-vterm eshell-git-prompt eldoc jsonrpc corfu nerd-icons-corfu evil-nerd-commenter sly auctex ztree markdown-mode copilot copilot-chat embark embark-consult vundo)
+  "Packages installed at launch.")
+
+(dolist (p packages)
+  (unless (package-installed-p p)
+    (package-install p)))
 
 ;; general settings
 
@@ -32,6 +41,10 @@
 (global-set-key (kbd "C-S-f") 'forward-word)
 (global-set-key (kbd "C-<tab>") 'tab-next)
 (global-set-key (kbd "C-S-<tab>") 'tab-previous)
+
+(global-set-key (kbd "C-;") 'dabbrev-expand)
+(glo)
+
 (define-key isearch-mode-map (kbd "C-,") 'isearch-delete-char)
 (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
 
@@ -50,7 +63,7 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (set-fringe-mode 10)
-(menu-bar-mode -1)
+(menu-bar-mode 1)
 (setq visible-bell t)
 (column-number-mode)
 (global-display-line-numbers-mode t)
@@ -65,53 +78,43 @@
 (set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 140)
 (set-face-attribute 'variable-pitch nil :font "Hack" :height 160 :weight 'regular)
 
-(package-install 'all-the-icons)
 (require 'all-the-icons)
 (unless (find-font (font-spec :name "all-the-icons"))
   (all-the-icons-install-fonts t))
 
-(package-install 'all-the-icons-completion)
 (all-the-icons-completion-mode 1)
 
 (mapc #'disable-theme custom-enabled-themes)
 
-(package-install 'doom-modeline)
 (require 'doom-modeline)
 (doom-modeline-mode 1)
 (setq doom-modeline-height 15)
 
-;; (package-install 'doom-themes)
 ;; (setq doom-themes-enable-bold t
 ;;       doom-themes-enable-italic t)
 ;; (load-theme 'doom-one t)
 ;; (doom-themes-visual-bell-config)
 ;; (doom-themes-org-config)
 
-;; (package-install 'modus-themes)
 ;; (require 'modus-themes)
 ;; (load-theme 'modus-vivendi :no-confirm)
 
-(package-install 'ef-themes)
 (require 'ef-themes)
 (load-theme 'ef-summer :no-confirm)
 
-(package-install 'avy)
 (setq avy-keys (number-sequence ?a ?z))
 (require 'avy)
 (global-set-key (kbd "C-'") 'avy-goto-word-1-below)
 (global-set-key (kbd "C-\"") 'avy-goto-word-1-above)
 
-(package-install 'rainbow-delimiters)
 (require 'rainbow-delimiters)
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
-(package-install 'highlight-parentheses)
 (require 'highlight-parentheses)
 (add-hook 'prog-mode-hook 'highlight-parentheses-mode)
 
 ;; helpful
 
-(package-install 'helpful)
 (require 'helpful)
 
 (global-set-key (kbd "C-h f") #'helpful-callable)
@@ -123,7 +126,6 @@
 
 ;; Completion
 
-(package-install 'vertico)
 (require 'vertico)
 (vertico-mode 1)
 (require 'vertico-directory)
@@ -138,19 +140,16 @@
 (setq read-extended-command-predicate #'command-completion-default-include-p)
 (setq enable-recursive-minibuffers t)
 
-(package-install 'orderless)
 (require 'orderless)
 (setq completion-styles '(orderless basic)
       completion-category-defaults nil
       completion-category-overrides '((file (styles partial-completion))
                                       (eglot (styles orderless))))
 
-(package-install 'marginalia)
 (require 'marginalia)
 (define-key minibuffer-local-map (kbd "M-A") 'marginalia-cycle)
 (marginalia-mode 1)
 
-(package-install 'consult)
 (require 'consult)
 (consult-customize consult-buffer :preview-key "C-x b")
 (global-set-key (kbd "C-x b") #'consult-buffer)
@@ -164,7 +163,6 @@
  consult--source-bookmark consult--source-recent-file
  consult--source-project-recent-file :preview-key (kbd "M-."))
 
-(package-install 'pulsar)
 (require 'pulsar)
 (setq pulsar-pulse-functions
       '(isearch-repeat-forward
@@ -213,8 +211,6 @@
 ;(setq split-width-threshold 0)
 
 (winner-mode 1)
-
-(package-install 'hydra)
 
 (defvar hydra-resize-window-amount 5)
 
@@ -278,20 +274,16 @@
 (setq dired-listing-switches "-agho --group-directories-first")
 (setq insert-directory-program "/opt/homebrew/bin/gls")
 (setq delete-by-moving-to-trash t)
-(global-set-key (kbd "C-x C-g") 'dired-jump)
+(with-eval-after-load 'dired
+  (define-key dired-mode-map (kbd "C-u +") 'dired-create-empty-file))
 
-(package-install 'dired-single)
-(package-install 'all-the-icons-dired)
 (if (display-graphic-p)
     (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 
-(package-install 'command-log-mode)
 (require 'command-log-mode)
 
-(package-install 'diminish)
 (require 'diminish)
 
-(package-install 'which-key)
 (require 'which-key)
 (which-key-mode 1)
 (diminish 'which-key-mode)
@@ -299,27 +291,22 @@
 
 ;; vc
 
-(package-install 'git-gutter)
 (require 'git-gutter)
 (global-git-gutter-mode 1)
 
-(package-install 'magit)
 (require 'magit)
 (define-key magit-section-mode-map (kbd "C-<tab>") nil)
 (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 
 ;; shell
 
-(package-install 'exec-path-from-shell)
 (require 'exec-path-from-shell)
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
-(package-install 'vterm)
 (require 'vterm)
 (setq vterm-max-scrollback 10000)
 
-(package-install 'multi-vterm)
 (require 'multi-vterm)
 
 (defun configure-eshell ()
@@ -337,35 +324,19 @@
   (setq eshell-visual-commands '("htop" "zsh" "vim"))
   (eshell-git-prompt-use-theme 'powerline))
 
-(package-install 'eshell-git-prompt)
 (require 'eshell-git-prompt)
 
 ;; languages
 
-;; (package-install 'flycheck)
 ;; (require 'flycheck)
 ;; (global-flycheck-mode 1)
 
-(package-install 'flymake)
 (require 'flymake)
 (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
 (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
 (add-hook 'emacs-lisp-mode-hook 'flymake-mode)
 
-(package-install 'solidity-mode)
-(require 'solidity-mode)
-(setq solidity-comment-style 'slash)
-(define-key solidity-mode-map (kbd "C-c C-g") 'solidity-estimate-gas-at-point)
-
-;; (package-install 'company-solidity)
-;; (require 'company-solidity)
-
 ;;; eglot
-
-(package-install 'project)
-(package-install 'xref)
-(package-install 'eldoc)
-(package-install 'jsonrpc)
 
 ;;; dape
 ;; (setq exec-path (cons "~/netcoredbg/bin" exec-path))
@@ -393,49 +364,59 @@
                                         ;             `(csharp-mode . ("~/omnisharp-osx-arm64-net6.0/OmniSharp" "-lsp")))
 (global-set-key (kbd "C-c e r") #'eglot-reconnect)
 
-;;; lsp-mode
-
-;(package-install 'lsp-mode)
-;(setq lsp-csharp-server-path "mono ~/omnisharp-mono/OmniSharp.exe")
-;(require 'lsp-mode)
-;(package-install 'lsp-ui)
-;(setq lsp-completion-provider :none)
-;(add-hook 'csharp-mode-hook #'lsp)
-;(setq lsp-headerline-breadcrumb-enable nil)
-;(setq lsp-lens-enable nil)
-
 ;;; corfu
 
-;; (package-install '(corfu :files ("*" (:exclude ".git") "extensions/*")))
 (require 'corfu)
 (global-corfu-mode)
 (corfu-popupinfo-mode)
 (corfu-echo-mode)
 (corfu-history-mode)
-(setq corfu-popupinfo-delay 0.1)
-(setq corfu-auto-delay 0.1)
-(setq corfu-auto t)
-(setq corfu-auto-prefix 2)
+;; (setq corfu-popupinfo-delay 0.1)
+;; (setq corfu-auto-delay 0.1)
+;; (setq corfu-auto t)
+;; (setq corfu-auto-prefix 2)
 (define-key corfu-map (kbd "C-m") nil)
 
-;; (package-install 'kind-icon)
 ;; (require 'kind-icon)
 ;; (setq kind-icon-default-face 'corfu-default)
 ;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-
-(package-install 'nerd-icons-corfu)
 (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+
+;; Enable Completion Preview mode in code buffers
+(add-hook 'prog-mode-hook #'completion-preview-mode)
+;; also in text buffers
+(add-hook 'text-mode-hook #'completion-preview-mode)
+;; and in \\[shell] and friends
+(with-eval-after-load 'comint
+  (add-hook 'comint-mode-hook #'completion-preview-mode))
+
+(with-eval-after-load 'completion-preview
+  ;; Show the preview already after two symbol characters
+  (setq completion-preview-minimum-symbol-length 2)
+
+  ;; Non-standard commands to that should show the preview:
+
+  ;; Org mode has a custom `self-insert-command'
+  (push 'org-self-insert-command completion-preview-commands)
+  ;; Paredit has a custom `delete-backward-char' command
+  (push 'paredit-backward-delete completion-preview-commands)
+
+  ;; Bindings that take effect when the preview is shown:
+
+  ;; Cycle the completion candidate that the preview shows
+  (keymap-set completion-preview-active-mode-map "M-n" #'completion-preview-next-candidate)
+  (keymap-set completion-preview-active-mode-map "M-p" #'completion-preview-prev-candidate)
+  ;; Convenient alternative to C-i after typing one of the above
+  (keymap-set completion-preview-active-mode-map "M-i" #'completion-preview-insert))
 
 ;;; cape
 
-;; (package-install 'cape)
 ;; (require 'cape)
 ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
 ;; (add-to-list 'completion-at-point-functions #'cape-file)
 
 ;;; company
 
-;; (package-install 'company)
 ;; (require 'company)
 ;; (setq company-global-modes '(not vterm-mode))
 ;; (setq company-keywords-ignore-case t)
@@ -449,13 +430,11 @@
 ;; (setq company-show-quick-access t)
 ;; (setq company-backends '(company-elisp company-capf))
 
-;; (package-install 'company-box)
 ;; (require 'company-box)
 ;; (add-hook 'company-mode-hook 'company-box-mode)
 
 (eldoc-add-command 'c-electric-paren)
 
-(package-install 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
 (global-set-key (kbd "C-c C-c") 'evilnc-comment-or-uncomment-lines)
 
@@ -464,8 +443,6 @@
 
 ;;; slime
 
-;; (package-install '(slime-cape :type git :host github :repo "ccqpein/slime-cape"))
-;; (package-install 'slime)
 ;; (require 'slime)
 
 ;; (require 'slime-autoloads)
@@ -474,7 +451,6 @@
 ;; (slime-setup '(slime-fancy slime-repl slime-scratch slime-trace-dialog slime-cl-indent slime-cape))
 
 ;;; sly
-(package-install 'sly)
 (require 'sly)
 
 (defun enable-sly-tramp ()
@@ -510,22 +486,15 @@
  shr-width 70                                ; Fold text to 70 columns
  eww-search-prefix "https://wiby.me/?q=")    ; Use another engine for searching
 
-(package-install 'docker)
-(require 'docker)
-(package-install 'docker-compose-mode)
-(require 'docker-compose-mode)
-(package-install 'dockerfile-mode)
-(require 'dockerfile-mode)
-
 ;;; latex
-
-(package-install 'auctex)
 
 ;;; medium
 
 ;;; org
 
+(require 'org)
 (add-hook 'org-mode-hook #'(lambda () (setq truncate-lines nil)))
+(setq org-default-notes-file (concat org-directory "/notes.org"))
 
 ;;; (define-key org-mode-map (kbd "C-,") 'org-delete-backward-char)
 
@@ -549,9 +518,6 @@
 
 ;; (global-set-key (kbd "C-c c") #'create-card)
 
-(package-install 'ztree)
-(package-install 'markdown-mode)
-
 (require 'server)
 (unless (server-running-p)
   (server-start))
@@ -562,22 +528,37 @@
 
 (add-hook 'server-visit-hook 'my-emacsclient-foreground)
 
-(package-install 'copilot)
-(require 'copilot)
-(add-hook 'prog-mode-hook 'copilot-mode)
-(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
-(add-to-list 'copilot-indentation-alist '(csharp-mode 4))
+;; (require 'copilot)
+;; (add-hook 'prog-mode-hook 'copilot-mode)
+;; (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+;; (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+;; (add-to-list 'copilot-indentation-alist '(csharp-mode 4))
+;; (setq copilot-idle-delay 10000000)
+;; (global-set-key (kbd "C-c c") #'(lambda ()
+;;                                   (interactive)
+;;                                   (corfu-quit)
+;;                                   (copilot-complete)))
 
-(package-install 'embark)
 (require 'embark)
-(global-set-key (kbd "C-;") 'embark-act)
+(define-key input-decode-map (kbd "C-[") [Control-bracket])
+(global-set-key [Control-bracket] 'embark-act)
 
 (require 'embark-consult)
 
-(package-install 'vundo)
 (require 'vundo)
 (setq vundo-glyph-alist vundo-unicode-symbols)
+
+(setq visible-bell nil
+      ring-bell-function 'flash-mode-line)
+(defun flash-mode-line ()
+  (invert-face 'mode-line)
+  (run-with-timer 0.1 nil #'invert-face 'mode-line))
+
+(setq ediff-split-window-function 'split-window-horizontally)
+
+
+(require 'gnus)
+(setq send-mail-function #'smtpmail-send-it)
 
 (provide 'init)
 ;;; init.el ends here
