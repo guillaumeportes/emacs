@@ -32,6 +32,8 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq-default indent-tabs-mode nil)
 
+(setq grep-program "rg")
+
 ;; keys
 
 (global-set-key (kbd "C-,") (kbd "<backspace>"))
@@ -43,7 +45,6 @@
 (global-set-key (kbd "C-S-<tab>") 'tab-previous)
 
 (global-set-key (kbd "C-;") 'dabbrev-expand)
-(glo)
 
 (define-key isearch-mode-map (kbd "C-,") 'isearch-delete-char)
 (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
@@ -104,7 +105,8 @@
 
 (setq avy-keys (number-sequence ?a ?z))
 (require 'avy)
-(global-set-key (kbd "C-'") 'avy-goto-word-1-below)
+(global-set-key (kbd "C-'") 'avy-goto-char-timer)
+(setq avy-timeout-seconds 0.25)
 (global-set-key (kbd "C-\"") 'avy-goto-word-1-above)
 
 (require 'rainbow-delimiters)
@@ -350,9 +352,7 @@
 
 (add-hook 'csharp-mode-hook 'eglot-ensure)
 (with-eval-after-load 'eglot
-  (setq eglot-sync-connect nil)
-  (add-to-list 'eglot-server-programs
-               '(csharp-mode . ("csharp-ls"))))
+  (setq eglot-sync-connect nil))
 
 (setq-default tab-width 4)
 ;(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
@@ -366,21 +366,22 @@
 
 ;;; corfu
 
-(require 'corfu)
-(global-corfu-mode)
-(corfu-popupinfo-mode)
-(corfu-echo-mode)
-(corfu-history-mode)
+;; (require 'corfu)
+;; (global-corfu-mode)
+;; (corfu-popupinfo-mode)
+;; (corfu-echo-mode)
+;; (corfu-history-mode)
 ;; (setq corfu-popupinfo-delay 0.1)
 ;; (setq corfu-auto-delay 0.1)
 ;; (setq corfu-auto t)
 ;; (setq corfu-auto-prefix 2)
-(define-key corfu-map (kbd "C-m") nil)
+;; (define-key corfu-map (kbd "C-m") nil)
+;; (setq completion-in-region-function #'consult-completion-in-region)
 
 ;; (require 'kind-icon)
 ;; (setq kind-icon-default-face 'corfu-default)
 ;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-(add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+;; (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
 
 ;; Enable Completion Preview mode in code buffers
 (add-hook 'prog-mode-hook #'completion-preview-mode)
