@@ -1,4 +1,8 @@
+;;; init.el --- this is my init.el
+;;; Commentary: not sure what I'm meant to say here!
 ;; packages
+
+;;; Code:
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -6,12 +10,56 @@
 (package-refresh-contents)
 
 (defvar packages
-  '(all-the-icons all-the-icons-completion doom-modeline ef-themes avy rainbow-delimiters highlight-parentheses helpful vertico orderless marginalia consult pulsar hydra all-the-icons-dired command-log-mode diminish which-key git-gutter magit exec-path-from-shell vterm multi-vterm eshell-git-prompt eldoc jsonrpc corfu nerd-icons-corfu evil-nerd-commenter sly auctex ztree markdown-mode copilot copilot-chat embark embark-consult vundo)
+  '(all-the-icons
+    all-the-icons-completion
+    doom-modeline
+    ef-themes
+    avy
+    rainbow-delimiters
+    highlight-parentheses
+    helpful
+    vertico
+    orderless
+    marginalia
+    consult
+    pulsar
+    hydra
+    all-the-icons-dired
+    command-log-mode
+    diminish
+    which-key
+    git-gutter
+    magit
+    exec-path-from-shell
+    vterm
+    multi-vterm
+    eshell-git-prompt
+    eldoc
+    jsonrpc
+    corfu
+    nerd-icons-corfu
+    evil-nerd-commenter
+    sly
+    auctex
+    ztree
+    markdown-mode
+    copilot-chat
+    embark
+    embark-consult
+    vundo
+    restclient
+    aidermacs
+    eat)
   "Packages installed at launch.")
 
 (dolist (p packages)
   (unless (package-installed-p p)
     (package-install p)))
+
+(use-package gemini-cli :ensure t
+  :vc (:url "https://github.com/linchen2chris/gemini-cli.el" :rev :newest)
+  :config (gemini-cli-mode)
+  :bind-keymap ("C-c c" . gemini-cli-command-map)) ;; or your preferred key
 
 ;; general settings
 
@@ -83,22 +131,14 @@
 (unless (find-font (font-spec :name "all-the-icons"))
   (all-the-icons-install-fonts t))
 
-(all-the-icons-completion-mode 1)
+(all-the-icons-completion-mode)
+(add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup)
 
 (mapc #'disable-theme custom-enabled-themes)
 
 (require 'doom-modeline)
 (doom-modeline-mode 1)
 (setq doom-modeline-height 15)
-
-;; (setq doom-themes-enable-bold t
-;;       doom-themes-enable-italic t)
-;; (load-theme 'doom-one t)
-;; (doom-themes-visual-bell-config)
-;; (doom-themes-org-config)
-
-;; (require 'modus-themes)
-;; (load-theme 'modus-vivendi :no-confirm)
 
 (require 'ef-themes)
 (load-theme 'ef-summer :no-confirm)
@@ -143,7 +183,7 @@
 (setq enable-recursive-minibuffers t)
 
 (require 'orderless)
-(setq completion-styles '(orderless basic)
+(setq completion-styles '(orderless basic flex)
       completion-category-defaults nil
       completion-category-overrides '((file (styles partial-completion))
                                       (eglot (styles orderless))))
@@ -164,6 +204,13 @@
  consult--source-buffer
  consult--source-bookmark consult--source-recent-file
  consult--source-project-recent-file :preview-key (kbd "M-."))
+
+(setf completion-auto-select t ;; Show completion on first call
+      completion-auto-help 'visible ;; Display *Completions* upon first request
+      completions-format 'one-column ;; Use only one column
+      completions-sort 'historical ;; Order based on minibuffer history
+      completions-max-height 20 ;; Limit completions to 15 (completions start at line 5)
+      completion-ignore-case t)
 
 (require 'pulsar)
 (setq pulsar-pulse-functions
@@ -299,8 +346,12 @@
 (require 'magit)
 (define-key magit-section-mode-map (kbd "C-<tab>") nil)
 (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+(setq magit-ediff-dwim-show-on-hunks t)
+(setopt magit-git-executable "/opt/homebrew/bin/git")
 
-;; shell
+(with-eval-after-load 'magit
+  (transient-append-suffix 'magit-log "-n"
+    '("-m" "No merges" "--no-merges")))
 
 (require 'exec-path-from-shell)
 (when (memq window-system '(mac ns x))
@@ -338,56 +389,20 @@
 (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
 (add-hook 'emacs-lisp-mode-hook 'flymake-mode)
 
-;;; eglot
-
-;;; dape
-;; (setq exec-path (cons "~/netcoredbg/bin" exec-path))
-;; (add-to-list 'dape-configs
-;;              `(unity modes
-;;                      (csharp-mode csharp-ts-mode)
-;;                      ensure dape-ensure-command command "~/.vscode/extensions/p1gd0g.unity-debug-301-4.0.1/bin/UnityDebug.exe" :request "launch" command-args
-;;                      ["--interpreter=vscode"]
-;;                      :cwd dape-cwd :program dape--netcoredbg-program :stopAtEntry nil))
-
-
 (add-hook 'csharp-mode-hook 'eglot-ensure)
 (with-eval-after-load 'eglot
   (setq eglot-sync-connect nil))
 
 (setq-default tab-width 4)
-;(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
-;(add-hook 'solidity-mode-hook 'eglot-ensure)
-;(add-hook 'sh-mode-hook 'eglot-ensure)
-;(add-to-list 'eglot-server-programs
-;             `(solidity-mode . ("solc" "--lsp")))
-;(add-to-list 'eglot-server-programs
-                                        ;             `(csharp-mode . ("~/omnisharp-osx-arm64-net6.0/OmniSharp" "-lsp")))
+
 (global-set-key (kbd "C-c e r") #'eglot-reconnect)
-
-;;; corfu
-
-;; (require 'corfu)
-;; (global-corfu-mode)
-;; (corfu-popupinfo-mode)
-;; (corfu-echo-mode)
-;; (corfu-history-mode)
-;; (setq corfu-popupinfo-delay 0.1)
-;; (setq corfu-auto-delay 0.1)
-;; (setq corfu-auto t)
-;; (setq corfu-auto-prefix 2)
-;; (define-key corfu-map (kbd "C-m") nil)
-;; (setq completion-in-region-function #'consult-completion-in-region)
-
-;; (require 'kind-icon)
-;; (setq kind-icon-default-face 'corfu-default)
-;; (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-;; (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
 
 ;; Enable Completion Preview mode in code buffers
 (add-hook 'prog-mode-hook #'completion-preview-mode)
 ;; also in text buffers
 (add-hook 'text-mode-hook #'completion-preview-mode)
 ;; and in \\[shell] and friends
+(add-hook 'eshell-mode-hook #'completion-preview-mode)
 (with-eval-after-load 'comint
   (add-hook 'comint-mode-hook #'completion-preview-mode))
 
@@ -409,30 +424,6 @@
   (keymap-set completion-preview-active-mode-map "M-p" #'completion-preview-prev-candidate)
   ;; Convenient alternative to C-i after typing one of the above
   (keymap-set completion-preview-active-mode-map "M-i" #'completion-preview-insert))
-
-;;; cape
-
-;; (require 'cape)
-;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-;; (add-to-list 'completion-at-point-functions #'cape-file)
-
-;;; company
-
-;; (require 'company)
-;; (setq company-global-modes '(not vterm-mode))
-;; (setq company-keywords-ignore-case t)
-;; (global-company-mode)
-;; (define-key company-mode-map (kbd "<tab>") 'company-complete-selection)
-;; (define-key company-active-map (kbd "C-m") nil)
-;; (define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
-
-;; (setq company-minimum-prefix-length 1)
-;; (setq company-idle-delay 0.2)
-;; (setq company-show-quick-access t)
-;; (setq company-backends '(company-elisp company-capf))
-
-;; (require 'company-box)
-;; (add-hook 'company-mode-hook 'company-box-mode)
 
 (eldoc-add-command 'c-electric-paren)
 
@@ -464,14 +455,6 @@
   (interactive)
   (setq sly-filename-translations (remove (nth (1- (length sly-filename-translations)) sly-filename-translations) sly-filename-translations)))
 
-;(add-to-list 'tramp-default-method-alist '("" "root" "ssh"))
-;(customize-set-variable 'tramp-default-method "ssh")
-
-;(load "~/quicklisp/log4sly-setup.el")
-;(global-log4sly-mode 1)
-
-;; (global-set-key (kbd "C-c s") #'slime-selector)
-
 (global-set-key (kbd "C-M-S-j") 'backward-sexp)
 (global-set-key (kbd "C-M-:") 'forward-sexp)
 (global-set-key (kbd "C-M-S-k") #'(lambda () (interactive) (re-search-backward "[()]")))
@@ -487,58 +470,15 @@
  shr-width 70                                ; Fold text to 70 columns
  eww-search-prefix "https://wiby.me/?q=")    ; Use another engine for searching
 
-;;; latex
-
-;;; medium
-
 ;;; org
 
 (require 'org)
 (add-hook 'org-mode-hook #'(lambda () (setq truncate-lines nil)))
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 
-;;; (define-key org-mode-map (kbd "C-,") 'org-delete-backward-char)
-
-(defun create-card ()
-  "Create a new card."
-  (interactive)
-  (let* ((file-name (read-file-name "Enter file name: "))
-         (inheritance (read-string "Enter inherited classes: "))
-         (card-name (file-name-sans-extension (file-name-nondirectory file-name))))
-    (find-file file-name)
-    (insert (format ";;;; %s\n\n" card-name))
-    (insert "(in-package :tinka.ccg.cards)")
-    (insert "\n\n")
-    (insert (format "(defcard %s (%s) ("  card-name inheritance))
-    (insert ":data-id ")
-    (insert "(defdata-id)")
-    (sly-macroexpand-1-inplace)
-    (insert "\n")
-    (insert ":rarity :common\n:cost ()\n:display-name \"\"\n:description \"\")\n)")
-    (indent-region 0 (point-max))))
-
-;; (global-set-key (kbd "C-c c") #'create-card)
-
 (require 'server)
 (unless (server-running-p)
   (server-start))
-
-(defun my-emacsclient-foreground ()
-  "Bring Emacs to the foreground using AppleScript."
-  (start-process "emacs-foreground" nil "osascript" (expand-file-name "~/bring_emacs_to_foreground.applescript")))
-
-(add-hook 'server-visit-hook 'my-emacsclient-foreground)
-
-;; (require 'copilot)
-;; (add-hook 'prog-mode-hook 'copilot-mode)
-;; (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-;; (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
-;; (add-to-list 'copilot-indentation-alist '(csharp-mode 4))
-;; (setq copilot-idle-delay 10000000)
-;; (global-set-key (kbd "C-c c") #'(lambda ()
-;;                                   (interactive)
-;;                                   (corfu-quit)
-;;                                   (copilot-complete)))
 
 (require 'embark)
 (define-key input-decode-map (kbd "C-[") [Control-bracket])
@@ -560,6 +500,22 @@
 
 (require 'gnus)
 (setq send-mail-function #'smtpmail-send-it)
+
+(require 'copilot-chat)
+(setopt copilot-chat-follow t)
+
+(require 'aidermacs)
+(global-set-key (kbd "C-c a") 'aidermacs-transient-menu)
+(exec-path-from-shell-copy-envs '("OPENAI_API_KEY" "OPENAI_API_BASE" "GEMINI_API_KEY"))
+(setopt aidermacs-default-model "gemini")
+(setopt aidermacs-backend 'comint)
+
+(setq ediff-window-setup-function #'ediff-setup-windows-plain)
+
+(add-to-list 'load-path "~/emacs/packages/")
+(let ((default-directory  "~/emacs/packages/"))
+  (normal-top-level-add-subdirs-to-load-path))
+(require 'flyover)
 
 (provide 'init)
 ;;; init.el ends here
