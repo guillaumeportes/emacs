@@ -49,17 +49,14 @@
     vundo
     restclient
     aidermacs
-    eat)
+    eat
+    gptel
+    mcp)
   "Packages installed at launch.")
 
 (dolist (p packages)
   (unless (package-installed-p p)
     (package-install p)))
-
-(use-package gemini-cli :ensure t
-  :vc (:url "https://github.com/linchen2chris/gemini-cli.el" :rev :newest)
-  :config (gemini-cli-mode)
-  :bind-keymap ("C-c c" . gemini-cli-command-map)) ;; or your preferred key
 
 ;; general settings
 
@@ -348,6 +345,7 @@
 (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 (setq magit-ediff-dwim-show-on-hunks t)
 (setopt magit-git-executable "/opt/homebrew/bin/git")
+(setopt magit-diff-refine-hunk t)
 
 (with-eval-after-load 'magit
   (transient-append-suffix 'magit-log "-n"
@@ -356,6 +354,8 @@
 (require 'exec-path-from-shell)
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
+
+(exec-path-from-shell-copy-envs '("LIBRARY_PATH"))
 
 (require 'vterm)
 (setq vterm-max-scrollback 10000)
@@ -388,6 +388,17 @@
 (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
 (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
 (add-hook 'emacs-lisp-mode-hook 'flymake-mode)
+
+(with-eval-after-load 'smerge-mode
+  (define-key smerge-mode-map (kbd "M-n") 'smerge-next)
+  (define-key smerge-mode-map (kbd "M-p") 'smerge-prev))
+
+(setq eglot-server-programs
+      '((csharp-mode . ("csharp-ls"))))
+
+;; (setq eglot-server-programs
+;;      '((csharp-mode . ("dotnet" "/Users/guillaume.portes/.omnisharp/OmniSharp.dll" "-lsp"))))
+;; (setq eglot-connect-timeout 120)
 
 (add-hook 'csharp-mode-hook 'eglot-ensure)
 (with-eval-after-load 'eglot
@@ -502,7 +513,7 @@
 (setq send-mail-function #'smtpmail-send-it)
 
 (require 'copilot-chat)
-(setopt copilot-chat-follow t)
+(setopt copilot-chat-follow nil)
 
 (require 'aidermacs)
 (global-set-key (kbd "C-c a") 'aidermacs-transient-menu)
@@ -516,6 +527,52 @@
 (let ((default-directory  "~/emacs/packages/"))
   (normal-top-level-add-subdirs-to-load-path))
 (require 'flyover)
+
+;;; gptel
+
+(require 'posframe)
+(require 'gptel-integrations)
+(require 'gptel-mcp)
+
+(gptel-make-gemini "Gemini" :key "AIzaSyAAkUc12r3zzeEs7YPaFgdT0qCm-saYKcs" :stream t)
+(gptel-make-gh-copilot "Copilot")
+(gptel-make-openai "OpenRouter"               ;Any name you want
+  :host "openrouter.ai"
+  :endpoint "/api/v1/chat/completions"
+  :stream t
+  :key "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"                   ;can be a function that returns the key
+  :models '(openai/gpt-3.5-turbo
+            mistralai/mixtral-8x7b-instruct
+            meta-llama/codellama-34b-instruct
+            codellama/codellama-70b-instruct
+            google/palm-2-codechat-bison-32k
+            google/gemini-pro
+            x-ai/grok-4.1-fast
+            mistralai/mistral-small-3.2-24b-instruct:free
+            deepseek/deepseek-chat-v3-0324:free))
+
+(gptel-make-ollama "Ollama"             ;Any name of your choosing
+  :host "localhost:11434"               ;Where it's running
+  :stream t                             ;Stream responses
+  :models '(deepseek-r1 mistral))          ;List of models
+
+(setq gptel-model 'claude-sonnet-4)
+
+(setq mcp-hub-servers
+      '(("filesystem" . (:command "npx"
+                                  :args ("-y" "@modelcontextprotocol/server-filesystem")
+                                  :roots ("/Users/guillaume.portes/dev/monster-survivors")))
+        ("git" . (:command "uvx"
+                           :args ("mcp-server-git")))
+        ("fetch" . (:command "uvx"
+                             :args ("mcp-server-fetch" "--ignore-robots-txt")))
+        ("ddg-search" . (:command "uvx"
+                                  :args ("duckduckgo-mcp-server")))
+        ("mcp-unity" . (:command "/Users/guillaume.portes/dev/monster-survivors/Library/mcp-server/osx-arm64/unity-mcp-server"
+                                 :args ("--port=8080" "--plugin-timeout=10000" "--client-transport=stdio")))))
+
+(add-hook 'after-init-hook
+          #'mcp-hub-start-all-server)
 
 (provide 'init)
 ;;; init.el ends here
