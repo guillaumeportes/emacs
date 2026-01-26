@@ -468,13 +468,6 @@
 (setq ediff-window-setup-function #'ediff-setup-windows-plain)
 
 (require 'gptel)
-(setq
- gptel-model 'mistral:latest
- gptel-backend (gptel-make-ollama "Ollama"
-                 :host "localhost:11434"
-                 :stream t
-                 :models '(ministral-3:latest)))
-
 (global-set-key (kbd "C-z") 'gptel-send)
 
 (require 'gptel-integrations)
@@ -488,30 +481,9 @@
 ;;; gptel
 
 (require 'posframe)
-(require 'gptel-integrations)
 (require 'gptel-mcp)
 
-(gptel-make-gemini "Gemini" :key "AIzaSyAAkUc12r3zzeEs7YPaFgdT0qCm-saYKcs" :stream t)
 (gptel-make-gh-copilot "Copilot")
-(gptel-make-openai "OpenRouter"               ;Any name you want
-  :host "openrouter.ai"
-  :endpoint "/api/v1/chat/completions"
-  :stream t
-  :key "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"                   ;can be a function that returns the key
-  :models '(openai/gpt-3.5-turbo
-            mistralai/mixtral-8x7b-instruct
-            meta-llama/codellama-34b-instruct
-            codellama/codellama-70b-instruct
-            google/palm-2-codechat-bison-32k
-            google/gemini-pro
-            x-ai/grok-4.1-fast
-            mistralai/mistral-small-3.2-24b-instruct:free
-            deepseek/deepseek-chat-v3-0324:free))
-
-(gptel-make-ollama "Ollama"             ;Any name of your choosing
-  :host "localhost:11434"               ;Where it's running
-  :stream t                             ;Stream responses
-  :models '(deepseek-r1 mistral))          ;List of models
 
 (setq gptel-model 'claude-sonnet-4)
 
