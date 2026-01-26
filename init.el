@@ -32,26 +32,22 @@
     magit
     exec-path-from-shell
     vterm
-    multi-vterm
     eshell-git-prompt
     eldoc
     jsonrpc
     corfu
     nerd-icons-corfu
     evil-nerd-commenter
-    sly
     auctex
     ztree
     markdown-mode
-    copilot-chat
     embark
     embark-consult
-    vundo
     restclient
-    aidermacs
-    eat
     gptel
-    mcp)
+    mcp
+    eat
+    slime)
   "Packages installed at launch.")
 
 (dolist (p packages)
@@ -360,8 +356,6 @@
 (require 'vterm)
 (setq vterm-max-scrollback 10000)
 
-(require 'multi-vterm)
-
 (defun configure-eshell ()
   (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
   (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
@@ -442,44 +436,10 @@
 (global-set-key (kbd "C-c C-c") 'evilnc-comment-or-uncomment-lines)
 
 ;;; common lisp
-(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(setq inferior-lisp-program "/opt/homebrew/bin/sbcl")
 
-;;; slime
-
-;; (require 'slime)
-
-;; (require 'slime-autoloads)
-;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
-;; (setq common-lisp-style-default "sbcl")
-;; (slime-setup '(slime-fancy slime-repl slime-scratch slime-trace-dialog slime-cl-indent slime-cape))
-
-;;; sly
-(require 'sly)
-
-(defun enable-sly-tramp ()
-  (interactive)
-  (add-to-list 'sly-filename-translations (sly-create-filename-translator :machine-instance (sly-machine-instance)
-                                                                          :remote-host "ccg-server"
-                                                                          :username "root")))
-
-(defun disable-sly-tramp ()
-  (interactive)
-  (setq sly-filename-translations (remove (nth (1- (length sly-filename-translations)) sly-filename-translations) sly-filename-translations)))
-
-(global-set-key (kbd "C-M-S-j") 'backward-sexp)
-(global-set-key (kbd "C-M-:") 'forward-sexp)
-(global-set-key (kbd "C-M-S-k") #'(lambda () (interactive) (re-search-backward "[()]")))
-(global-set-key (kbd "C-M-S-l") #'(lambda () (interactive) (re-search-forward "[()]")))
-
-;;; eww
-
-(setq
- browse-url-browser-function 'eww-browse-url ; Use eww as the default browser
- shr-use-fonts  nil                          ; No special fonts
- shr-use-colors nil                          ; No colours
- shr-indentation 2                           ; Left-side margin
- shr-width 70                                ; Fold text to 70 columns
- eww-search-prefix "https://wiby.me/?q=")    ; Use another engine for searching
+(require 'slime-autoloads)
+(setq slime-contribs '(slime-fancy))
 
 ;;; org
 
@@ -497,9 +457,6 @@
 
 (require 'embark-consult)
 
-(require 'vundo)
-(setq vundo-glyph-alist vundo-unicode-symbols)
-
 (setq visible-bell nil
       ring-bell-function 'flash-mode-line)
 (defun flash-mode-line ()
@@ -508,25 +465,25 @@
 
 (setq ediff-split-window-function 'split-window-horizontally)
 
-
-(require 'gnus)
-(setq send-mail-function #'smtpmail-send-it)
-
-(require 'copilot-chat)
-(setopt copilot-chat-follow nil)
-
-(require 'aidermacs)
-(global-set-key (kbd "C-c a") 'aidermacs-transient-menu)
-(exec-path-from-shell-copy-envs '("OPENAI_API_KEY" "OPENAI_API_BASE" "GEMINI_API_KEY"))
-(setopt aidermacs-default-model "gemini")
-(setopt aidermacs-backend 'comint)
-
 (setq ediff-window-setup-function #'ediff-setup-windows-plain)
 
-(add-to-list 'load-path "~/emacs/packages/")
-(let ((default-directory  "~/emacs/packages/"))
-  (normal-top-level-add-subdirs-to-load-path))
-(require 'flyover)
+(require 'gptel)
+(setq
+ gptel-model 'mistral:latest
+ gptel-backend (gptel-make-ollama "Ollama"
+                 :host "localhost:11434"
+                 :stream t
+                 :models '(ministral-3:latest)))
+
+(global-set-key (kbd "C-z") 'gptel-send)
+
+(require 'gptel-integrations)
+(require 'mcp)
+(setq mcp-hub-servers
+      '(("filesystem" . (:command "npx"
+                         :args ("-y" "@modelcontextprotocol/server-filesystem")
+                         :roots ("~/emacs/")))
+        ("fetch" . (:command "uvx" :args ("mcp-server-fetch")))))
 
 ;;; gptel
 
