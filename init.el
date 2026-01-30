@@ -8,6 +8,7 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 (package-refresh-contents)
+(setq package-install-upgrade-built-in t)
 
 (defvar packages
   '(all-the-icons
@@ -47,7 +48,8 @@
     gptel
     mcp
     eat
-    slime)
+    slime
+    posframe)
   "Packages installed at launch.")
 
 (dolist (p packages)
@@ -192,11 +194,6 @@
 (global-set-key (kbd "C-x p b") #'consult-project-buffer)
 (consult-customize consult-mark :preview-key "M-g m")
 (consult-customize consult-imenu :preview-key "M-g i")
-
-(consult-customize
- consult--source-buffer
- consult--source-bookmark consult--source-recent-file
- consult--source-project-recent-file :preview-key (kbd "M-."))
 
 (setf completion-auto-select t ;; Show completion on first call
       completion-auto-help 'visible ;; Display *Completions* upon first request
@@ -470,6 +467,18 @@
 (require 'gptel)
 (global-set-key (kbd "C-z") 'gptel-send)
 
+;; OpenRouter offers an OpenAI compatible API
+(setq gptel-backend
+      (gptel-make-openai "OpenRouter"               ;Any name you want
+        :host "openrouter.ai"
+        :endpoint "/api/v1/chat/completions"
+        :stream t
+        :key (plist-get (car (auth-source-search :host "openrouter.ai" :user "api-key")) :secret)
+        :models '(anthropic/claude-sonnet-4.5
+                  minimax/minimax-m2.1)))
+      
+
+
 (require 'gptel-integrations)
 (require 'mcp)
 (setq mcp-hub-servers
@@ -481,11 +490,11 @@
 ;;; gptel
 
 (require 'posframe)
-(require 'gptel-mcp)
+;(require 'gptel-mcp)
 
-(gptel-make-gh-copilot "Copilot")
+;(gptel-make-gh-copilot "Copilot")
 
-(setq gptel-model 'claude-sonnet-4)
+;(setq gptel-model 'claude-sonnet-4)
 
 (setq mcp-hub-servers
       '(("filesystem" . (:command "npx"
