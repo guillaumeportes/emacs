@@ -483,7 +483,7 @@
 (require 'posframe)
 (require 'gptel-mcp)
 
-(gptel-make-gh-copilot "Copilot")
+(setq gptel-backend-copilot (gptel-make-gh-copilot "Copilot"))
 
 (setq gptel-model 'claude-sonnet-4)
 
@@ -502,6 +502,41 @@
 
 (add-hook 'after-init-hook
           #'mcp-hub-start-all-server)
+
+(defconst gptel-magit-prompt-conventional-commits
+  "You are an expert at writing Git commits. Your job is to write a short clear commit message that summarizes the changes.
+
+The commit message should be structured as follows:
+
+    <type>(<optional scope>): <description>
+
+    [optional body]
+
+- Commits MUST be prefixed with a type, which consists of one of the followings words: build, chore, ci, docs, feat, fix, perf, refactor, style, test
+- The type feat MUST be used when a commit adds a new feature
+- The type fix MUST be used when a commit represents a bug fix
+- An optional scope MAY be provided after a type. A scope is a phrase describing a section of the codebase enclosed in parenthesis, e.g., fix(parser):
+- A description MUST immediately follow the type/scope prefix. The description is a short description of the code changes, e.g., fix: array parsing issue when multiple spaces were contained in string.
+- Try to limit the whole subject line to 60 characters
+- Capitalize the subject line
+- Do not end the subject line with any punctuation
+- A longer commit body MAY be provided after the short description, providing additional contextual information about the code changes. The body MUST begin one blank line after the description.
+- Use the imperative mood in the subject line
+- Keep the body short and concise (omit it entirely if not useful)
+Only return the commit message in your response. Do not include any additional meta-commentary about the task. Do not include the raw diff output in the commit message.
+"
+  "A prompt adapted from Conventional Commits (https://www.conventionalcommits.org/en/v1.0.0/).")
+
+(defun gptel-commit-message ()
+  (interactive)
+  (let ((gptel-backend gptel-backend-copilot)
+        (gptel-model "gpt-4o"))
+    (gptel-request `(:messages [(:role "system" :content ,(format "%s%s" gptel-magit-prompt-conventional-commits (magit-toplevel)))]
+                               :stream t
+                               :temperature 1.0
+                               :parallel_tool_calls t))))
+
+(setq gptel-expert-commands t)
 
 (provide 'init)
 ;;; init.el ends here
