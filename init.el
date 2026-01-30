@@ -32,7 +32,6 @@
     git-gutter
     magit
     exec-path-from-shell
-    vterm
     eshell-git-prompt
     eldoc
     jsonrpc
@@ -114,8 +113,7 @@
 (dolist (mode '(org-mode-hook
                 term-mode-hook
                 eshell-mode-hook
-                shell-mode-hook
-                vterm-mode-hook))
+                shell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (set-face-attribute 'default nil :font "Fira Mono" :height 140)
@@ -349,9 +347,6 @@
   (exec-path-from-shell-initialize))
 
 (exec-path-from-shell-copy-envs '("LIBRARY_PATH"))
-
-(require 'vterm)
-(setq vterm-max-scrollback 10000)
 
 (defun configure-eshell ()
   (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
