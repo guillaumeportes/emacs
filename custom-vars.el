@@ -11,24 +11,18 @@
      default))
  '(fast-but-imprecise-scrolling t)
  '(package-selected-packages
-   '(aidermacs all-the-icons-completion all-the-icons-dired auctex avy
-               command-log-mode copilot-chat corfu diminish
-               doom-modeline doom-themes eat ef-themes embark-consult
-               eshell-git-prompt evil-nerd-commenter
-               exec-path-from-shell git-gutter gptel gptel-mcp
-               gptel-quick helpful highlight-parentheses hydra magit
-               marginalia mct multi-vterm nerd-icons-corfu orderless
-               posframe "postframe" postframe pulsar
-               rainbow-delimiters restclient sly vertico vundo wgrep
-               ztree))
+   '(all-the-icons-completion all-the-icons-dired avy command-log-mode
+                              diminish doom-modeline ef-themes eglot
+                              embark-consult eshell-git-prompt
+                              exec-path-from-shell git-gutter
+                              glsl-mode gnu-elpa-keyring-update gptel
+                              gptel-agent helpful
+                              highlight-parentheses hydra magit
+                              marginalia markdown-mode pulsar
+                              rainbow-delimiters restclient scala-mode
+                              vertico ztree))
  '(package-vc-selected-packages
-   '((gptel-mcp :vc-backend Git :url
-                "https://github.com/lizqwerscott/gptel-mcp.el")
-     (gptel-quick :vc-backend Git :url
-                  "https://github.com/karthink/gptel-quick")
-     (posframe :vc-backend Git :url
-               "https://github.com/tumashu/posframe")
-     (gemini-cli :url "https://github.com/linchen2chris/gemini-cli.el")))
+   '((gemini-cli :url "https://github.com/linchen2chris/gemini-cli.el")))
  '(scroll-conservatively 101)
  '(scroll-margin 0)
  '(scroll-preserve-screen-position t))

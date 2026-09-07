@@ -11,7 +11,8 @@
 (setq package-install-upgrade-built-in t)
 
 (defvar packages
-  '(all-the-icons
+  '(gnu-elpa-keyring-update
+    all-the-icons
     all-the-icons-completion
     doom-modeline
     ef-themes
@@ -35,20 +36,12 @@
     eshell-git-prompt
     eldoc
     jsonrpc
-    corfu
-    nerd-icons-corfu
-    evil-nerd-commenter
-    auctex
     ztree
     markdown-mode
     embark
     embark-consult
     restclient
-    gptel
-    mcp
-    eat
-    slime
-    posframe)
+    scala-mode)
   "Packages installed at launch.")
 
 (dolist (p packages)
@@ -85,7 +78,7 @@
 (global-set-key (kbd "C-S-f") 'forward-word)
 (global-set-key (kbd "C-<tab>") 'tab-next)
 (global-set-key (kbd "C-S-<tab>") 'tab-previous)
-
+(global-set-key (kbd "M-z") 'zap-up-to-char)
 (global-set-key (kbd "C-;") 'dabbrev-expand)
 
 (define-key isearch-mode-map (kbd "C-,") 'isearch-delete-char)
@@ -346,7 +339,14 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
-(exec-path-from-shell-copy-envs '("LIBRARY_PATH"))
+(exec-path-from-shell-copy-envs '("PATH"
+                                  "JAVA_HOME"
+                                  "LIBRARY_PATH"
+                                  "VULKAN_SDK"
+                                  "DYLD_LIBRARY_PATH"
+                                  "VK_ICD_FILENAMES"
+                                  "VK_DRIVER_FILES"
+                                  "VK_ADD_LAYER_PATH"))
 
 (defun configure-eshell ()
   (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
@@ -424,14 +424,7 @@
 
 (eldoc-add-command 'c-electric-paren)
 
-(require 'evil-nerd-commenter)
-(global-set-key (kbd "C-c C-c") 'evilnc-comment-or-uncomment-lines)
-
-;;; common lisp
-(setq inferior-lisp-program "/opt/homebrew/bin/sbcl")
-
-(require 'slime-autoloads)
-(setq slime-contribs '(slime-fancy))
+(load "~/emacs/common-lisp.el")
 
 ;;; org
 
@@ -459,8 +452,23 @@
 
 (setq ediff-window-setup-function #'ediff-setup-windows-plain)
 
+(unless (package-installed-p 'gptel)
+  (package-vc-install "https://github.com/karthink/gptel"))
 (require 'gptel)
+
+(unless (package-installed-p 'gptel-agent)
+  (package-vc-install "https://github.com/karthink/gptel-agent"))
+(require 'gptel-agent)
+(require 'gptel-agent-tools)
+
 (global-set-key (kbd "C-z") 'gptel-send)
+(gptel-highlight-mode)
+(define-globalized-minor-mode gptel-highlight-mode-global
+  gptel-highlight-mode
+  (lambda () (gptel-highlight-mode)))
+(gptel-highlight-mode-global)
+
+(setq epg-pinentry-mode 'loopback)
 
 ;; OpenRouter offers an OpenAI compatible API
 (setq gptel-backend
@@ -469,43 +477,33 @@
         :endpoint "/api/v1/chat/completions"
         :stream t
         :key (plist-get (car (auth-source-search :host "openrouter.ai" :user "api-key")) :secret)
-        :models '(anthropic/claude-sonnet-4.5
-                  minimax/minimax-m2.1)))
-      
+        :models '(meta/muse-spark-1.2-contributor
+                  meta/muse-glimmer-30b
+                  tencent/hy3
+                  openai/gpt-5.6-luna-pro
+                  openai/gpt-5.6-luna
+                  openai/gpt-5.6-terra
+                  anthropic/claude-sonnet-5
+                  z-ai/glm-5.2
+                  minimax/minimax-m3
+                  deepseek/deepseek-v4-flash-0731
+                  deepseek/deepseek-v4-pro-latest
+                  xiaomi/mimo-v2.5
+                  moonshotai/kimi-k3
+                  qwen/qwen3.7-plus
+                  google/gemini-3.7-flash:batch
+                  stealth/ox-alpha)))
 
+(add-hook 'gptel-post-response-functions 'gptel-end-of-response)
+(setopt gptel-model 'openai/gpt-5.6-luna)
+(gptel-agent-update)
 
-(require 'gptel-integrations)
-(require 'mcp)
-(setq mcp-hub-servers
-      '(("filesystem" . (:command "npx"
-                         :args ("-y" "@modelcontextprotocol/server-filesystem")
-                         :roots ("~/emacs/")))
-        ("fetch" . (:command "uvx" :args ("mcp-server-fetch")))))
-
-;;; gptel
-
-(require 'posframe)
-;(require 'gptel-mcp)
-
-;(gptel-make-gh-copilot "Copilot")
-
-;(setq gptel-model 'claude-sonnet-4)
-
-(setq mcp-hub-servers
-      '(("filesystem" . (:command "npx"
-                                  :args ("-y" "@modelcontextprotocol/server-filesystem")
-                                  :roots ("/Users/guillaume.portes/dev/monster-survivors")))
-        ("git" . (:command "uvx"
-                           :args ("mcp-server-git")))
-        ("fetch" . (:command "uvx"
-                             :args ("mcp-server-fetch" "--ignore-robots-txt")))
-        ("ddg-search" . (:command "uvx"
-                                  :args ("duckduckgo-mcp-server")))
-        ("mcp-unity" . (:command "/Users/guillaume.portes/dev/monster-survivors/Library/mcp-server/osx-arm64/unity-mcp-server"
-                                 :args ("--port=8080" "--plugin-timeout=10000" "--client-transport=stdio")))))
-
-(add-hook 'after-init-hook
-          #'mcp-hub-start-all-server)
+(gptel-make-preset 'common-lisp
+  :description "A preset for Common Lisp help"
+  :backend "OpenRouter"
+  :model 'mistralai/devstral-2512
+  :system "You are an expert Common Lisp coding assistant. Your role is to provide high-quality code solutions, refactorings, and explanations. You are thoughtful and are not trying to please the user. You are happy to be challenged and to challenge. Your priority is to provide idiomatic, well engineered responses. Responses should be succint when possible."
+  :tools '("search_web" "read_url"))
 
 (provide 'init)
 ;;; init.el ends here
