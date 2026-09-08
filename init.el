@@ -41,12 +41,16 @@
     embark
     embark-consult
     restclient
-    scala-mode)
+    scala-mode
+    gptel
+    gptel-agent)
   "Packages installed at launch.")
 
 (dolist (p packages)
   (unless (package-installed-p p)
     (package-install p)))
+
+(setq gc-cons-threshold (* 100 1024 1024))
 
 ;; general settings
 
@@ -84,6 +88,9 @@
 (define-key isearch-mode-map (kbd "C-,") 'isearch-delete-char)
 (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
 
+(require 'treesit)
+(setq treesit-auto-install-grammar 'always)
+(customize-set-variable 'treesit-enabled-modes t)
 
 ;; ui
 
@@ -380,13 +387,8 @@
   (define-key smerge-mode-map (kbd "M-p") 'smerge-prev))
 
 (setq eglot-server-programs
-      '((csharp-mode . ("csharp-ls"))))
-
-;; (setq eglot-server-programs
-;;      '((csharp-mode . ("dotnet" "/Users/guillaume.portes/.omnisharp/OmniSharp.dll" "-lsp"))))
-;; (setq eglot-connect-timeout 120)
-
-(add-hook 'csharp-mode-hook 'eglot-ensure)
+      '((csharp-ts-mode . ("csharp-ls"))))
+(add-hook 'csharp-ts-mode-hook 'eglot-ensure)
 (with-eval-after-load 'eglot
   (setq eglot-sync-connect nil))
 
@@ -498,12 +500,10 @@
 (setopt gptel-model 'openai/gpt-5.6-luna)
 (gptel-agent-update)
 
-(gptel-make-preset 'common-lisp
-  :description "A preset for Common Lisp help"
-  :backend "OpenRouter"
-  :model 'mistralai/devstral-2512
-  :system "You are an expert Common Lisp coding assistant. Your role is to provide high-quality code solutions, refactorings, and explanations. You are thoughtful and are not trying to please the user. You are happy to be challenged and to challenge. Your priority is to provide idiomatic, well engineered responses. Responses should be succint when possible."
-  :tools '("search_web" "read_url"))
+(defun my-gptel-load-project-locals ()
+  (hack-dir-local-variables-non-file-buffer))
+
+(add-hook 'gptel-mode-hook #'my-gptel-load-project-locals)
 
 (provide 'init)
 ;;; init.el ends here
