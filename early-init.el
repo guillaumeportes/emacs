@@ -1,6 +1,6 @@
 ;;; early-init.el -*- lexical-binding: t; -*-
 
-;; Turn GC off during startup; gcmg takes over in init.el
+;; Turn GC off during startup; gcmh takes over in init.el
 (setq gc-cons-threshold most-positive-fixnum)
 
 ;; libgccjit (bundled, 14.3.0) emits -mmacosx-version-min=18.0, which this
