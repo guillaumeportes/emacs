@@ -510,11 +510,14 @@
 (require 'agent-shell)
 
 (with-eval-after-load 'agent-shell
-  (keymap-unset agent-shell-mode-map "C-<tab>" t))
+  (keymap-unset agent-shell-mode-map "C-<tab>" t)
+  (keymap-set agent-shell-mode-map "<remap> <comint-send-input>" #'newline)
+  (keymap-set agent-shell-mode-map "C-z" #'agent-shell-submit))
 
 (with-eval-after-load 'agent-shell-viewport
   (keymap-unset agent-shell-viewport-edit-mode-map "C-<tab>" t)
-  (keymap-unset agent-shell-viewport-view-mode-map "C-<tab>" t))
+  (keymap-unset agent-shell-viewport-view-mode-map "C-<tab>" t)
+  (keymap-set agent-shell-viewport-edit-mode-map "C-z" #'agent-shell-viewport-compose-send))
 
 (provide 'init)
 ;;; init.el ends here
