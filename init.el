@@ -32,6 +32,7 @@
     which-key
     git-gutter
     magit
+    forge
     exec-path-from-shell
     eshell-git-prompt
     eldoc
@@ -43,14 +44,18 @@
     restclient
     scala-mode
     gptel
-    gptel-agent)
+    gptel-agent
+    gcmh
+    agent-shell)
   "Packages installed at launch.")
 
 (dolist (p packages)
   (unless (package-installed-p p)
     (package-install p)))
 
-(setq gc-cons-threshold (* 100 1024 1024))
+(gcmh-mode 1)
+
+(setopt global-subword-mode t)
 
 ;; general settings
 
@@ -72,6 +77,7 @@
 (setq-default indent-tabs-mode nil)
 
 (setq grep-program "rg")
+(setopt pop-up-windows nil)
 
 ;; keys
 
@@ -339,6 +345,7 @@
 (setopt magit-diff-refine-hunk t)
 
 (with-eval-after-load 'magit
+  (require 'forge)
   (transient-append-suffix 'magit-log "-n"
     '("-m" "No merges" "--no-merges")))
 
@@ -370,6 +377,12 @@
   (setq eshell-visual-commands '("htop" "zsh" "vim"))
   (eshell-git-prompt-use-theme 'powerline))
 
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (setq-local completion-preview-completion-styles '(basic))
+            (completion-preview-mode 1))
+          90)
+
 (require 'eshell-git-prompt)
 
 ;; languages
@@ -400,14 +413,13 @@
 (add-hook 'prog-mode-hook #'completion-preview-mode)
 ;; also in text buffers
 (add-hook 'text-mode-hook #'completion-preview-mode)
-;; and in \\[shell] and friends
-(add-hook 'eshell-mode-hook #'completion-preview-mode)
 (with-eval-after-load 'comint
   (add-hook 'comint-mode-hook #'completion-preview-mode))
 
 (with-eval-after-load 'completion-preview
   ;; Show the preview already after two symbol characters
   (setq completion-preview-minimum-symbol-length 2)
+  (setq completion-preview-idle-delay 0.25)
 
   ;; Non-standard commands to that should show the preview:
 
@@ -479,31 +491,30 @@
         :endpoint "/api/v1/chat/completions"
         :stream t
         :key (plist-get (car (auth-source-search :host "openrouter.ai" :user "api-key")) :secret)
-        :models '(meta/muse-spark-1.2-contributor
-                  meta/muse-glimmer-30b
-                  tencent/hy3
-                  openai/gpt-5.6-luna-pro
-                  openai/gpt-5.6-luna
-                  openai/gpt-5.6-terra
-                  anthropic/claude-sonnet-5
-                  z-ai/glm-5.2
-                  minimax/minimax-m3
-                  deepseek/deepseek-v4-flash-0731
-                  deepseek/deepseek-v4-pro-latest
-                  xiaomi/mimo-v2.5
-                  moonshotai/kimi-k3
-                  qwen/qwen3.7-plus
-                  google/gemini-3.7-flash:batch
-                  stealth/ox-alpha)))
+        :models '(openrouter/auto
+                  openrouter/auto-beta
+                  (~deepseek/deepseek-flash-latest :capabilities (media json tool-use) :mimetypes ("image/png" "image/jpeg"))
+                  ~deepseek/deepseek-pro-latest
+                  xiaomi/mimo-v2.6-flash
+                  xiaomi/mimo-v2.6-pro:nitro)))
 
 (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
-(setopt gptel-model 'openai/gpt-5.6-luna)
+(setopt gptel-model '~deepseek/deepseek-flash-latest)
 (gptel-agent-update)
 
 (defun my-gptel-load-project-locals ()
   (hack-dir-local-variables-non-file-buffer))
 
 (add-hook 'gptel-mode-hook #'my-gptel-load-project-locals)
+
+(require 'agent-shell)
+
+(with-eval-after-load 'agent-shell
+  (keymap-unset agent-shell-mode-map "C-<tab>" t))
+
+(with-eval-after-load 'agent-shell-viewport
+  (keymap-unset agent-shell-viewport-edit-mode-map "C-<tab>" t)
+  (keymap-unset agent-shell-viewport-view-mode-map "C-<tab>" t))
 
 (provide 'init)
 ;;; init.el ends here

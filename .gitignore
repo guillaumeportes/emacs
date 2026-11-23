@@ -17,3 +17,11 @@ smex-items
 /projects
 /.lsp-session-v1
 .aider*
+custom-vars.el
+/eln-cache/
+/tree-sitter/
+/url/
+/agent/
+/tramp
+/forge-database.sqlite
+network-security.eld
